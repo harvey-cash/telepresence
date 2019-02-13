@@ -12,11 +12,11 @@ public class DisplayMeshGenerator : MonoBehaviour {
     public int xVerts = 32, yVerts = 18;
     private float xDelta, yDelta;
 
-    public int webCamID;
+    // public int webCamID; ~~ NOT USING WEBCAMS
 
     private void Start() {
         UpdateMesh();
-        UpdateCamTexture();        
+        // UpdateCamTexture(); ~~ NOT USING WEBCAMS
     }
 
     private void OnValidate() {        
@@ -39,6 +39,7 @@ public class DisplayMeshGenerator : MonoBehaviour {
         GetComponent<MeshFilter>().mesh = mesh;
     }
 
+    /* ~~ NOT USING WEBCAMS
     void UpdateCamTexture() {
         WebCamDevice[] devices = WebCamTexture.devices;
         WebCamTexture feed = new WebCamTexture(devices[webCamID].name, 1920, 1080, 60);
@@ -46,6 +47,7 @@ public class DisplayMeshGenerator : MonoBehaviour {
         surface.mainTexture = feed;
         feed.Play();
     }
+    */
 
     class Vertex {
         public int index;
