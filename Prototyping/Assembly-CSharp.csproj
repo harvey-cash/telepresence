@@ -60,11 +60,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\DisplayMeshGenerator.cs" />
-    <Compile Include="Assets\Scripts\DisplayMovement.cs" />
-    <Compile Include="Assets\Scripts\DisplayTexture.cs" />
-    <Compile Include="Assets\Scripts\RobotEye.cs" />
-    <Compile Include="Assets\Scripts\RobotHead.cs" />
+    <Compile Include="Assets\Scripts\Imagery\ImageStitcher.cs" />
+    <Compile Include="Assets\Scripts\Imagery\Stabilisation.cs" />
+    <Compile Include="Assets\Scripts\Network\Network.cs" />
+    <Compile Include="Assets\Scripts\Robot\TelepresenceRobot.cs" />
+    <Compile Include="Assets\Scripts\Robot\VirtualRobot.cs" />
+    <Compile Include="Assets\Scripts\User\DesktopMonitor.cs" />
+    <Compile Include="Assets\Scripts\User\User.cs" />
+    <Compile Include="Assets\Scripts\User\Viewer.cs" />
+    <Compile Include="Assets\Scripts\User\VRHeadset.cs" />
+    <Compile Include="Assets\Scripts\VirtualDisplay\DisplayMeshGenerator.cs" />
+    <Compile Include="Assets\Scripts\VirtualDisplay\DisplayMovement.cs" />
+    <Compile Include="Assets\Scripts\VirtualDisplay\DisplayTexture.cs" />
+    <Compile Include="Assets\Scripts\VirtualDisplay\VirtualDisplay.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_GazeTracker.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_LaserPointer.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_Teleporter.cs" />

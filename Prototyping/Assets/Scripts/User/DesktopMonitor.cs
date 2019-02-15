@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RobotEye : MonoBehaviour
+public class DesktopMonitor : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
     {
-        GetComponent<Camera>().cullingMask = LayerMask.GetMask("Elsewhere");
+        
     }
 
     // Update is called once per frame
