@@ -69,8 +69,10 @@ public class VirtualDisplay : MonoBehaviour
             display.LoadImage(imagery); // Load JPEG into texture
             surface.mainTexture = display;
 
-            // View decoupling
-            UpdatePose();
+            // View decoupling            
+            if (Config.DECOUPLE) {
+                UpdatePose();
+            }
         }
 
         
@@ -78,9 +80,7 @@ public class VirtualDisplay : MonoBehaviour
 
     // Update pose to most accurate representation, as frame has been rendered
     private void UpdatePose() {
-        if (Config.DECOUPLE) {
-            transform.position = poseRobot.position + poseDelta.position;
-            transform.rotation = poseRobot.rotation; // ignore delta for now
-        }
+        transform.position = poseRobot.position + poseDelta.position;
+        transform.rotation = poseRobot.rotation; // ignore delta for now
     }
 }
