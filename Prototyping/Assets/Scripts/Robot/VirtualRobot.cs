@@ -10,12 +10,10 @@ using UnityEngine;
 public class VirtualRobot : TelepresenceRobot
 {
     public const float CAMERA_FRAME_WAIT = 67f; // time in ms between frames. Roughly 15FPS
-    public const int IMAGE_WIDTH = 100, IMAGE_HEIGHT = 100;
+    public const int IMAGE_WIDTH = 1280, IMAGE_HEIGHT = 720;
 
     public Camera leftCamera, rightCamera;
-    private RenderTexture renderTexture;
-    private Rect rect;
-    Texture2D image;
+    private RenderTexture rendTex;
 
     public override void ReceiveHeadPose(float timestamp, Pose headPose) {
         // MOVE TOWARDS MATCHING POSE
@@ -23,43 +21,60 @@ public class VirtualRobot : TelepresenceRobot
 
     private void Start() {
         // Ensure cameras are disabled for manual rendering
-        leftCamera.enabled = false;
-        rightCamera.enabled = false;
+        CameraSetup();
 
         // Post camera imagery repeatedly
-        InvokeRepeating("PostImagery", 1f, CAMERA_FRAME_WAIT / 1000f);
+        InvokeRepeating("TakeImagery", 1f, CAMERA_FRAME_WAIT / 1000f);
     }
 
-    // Send head pose over the Network
-    private void PostImagery() {
-        Texture2D left = RTImage(leftCamera);
-        Texture2D right = RTImage(rightCamera);
-
-        System.Action<float, Texture2D, Texture2D> target = Network.User.ReceiveCameraImagery;
-
-        StartCoroutine(Network.Post(target, Time.time / 1000f, left, right));
+    // Disable cameras to avoid unecessary overhead, and create RenderTextures
+    private void CameraSetup() {
+        leftCamera.enabled = false;
+        rightCamera.enabled = false;
+        rendTex = new RenderTexture(IMAGE_WIDTH, IMAGE_HEIGHT, 24);
     }
 
-    // ~~~~~~~ CODE BELOW ADAPTED FROM UNITY DOCUMENTATION ~~~~~~~~ //
+    // Simply call the RTImage coroutine
+    private void TakeImagery() {
+        StartCoroutine(RTImage());
+    }
 
-    // Take a "screenshot" of a camera's Render Texture.
-    Texture2D RTImage(Camera eyeCam) {
-        // creates off-screen render texture that can rendered into
-        rect = new Rect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-        renderTexture = new RenderTexture(IMAGE_WIDTH, IMAGE_HEIGHT, 24);
-        image = new Texture2D(IMAGE_WIDTH, IMAGE_HEIGHT, TextureFormat.RGB24, false);
+    // Take a "screenshot" of each camera's Render Texture.
+    // We wait for end of frame as otherwise Unity throws errors
+    WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
+    private IEnumerator RTImage() {
+        yield return frameEnd;
+        Texture2D left = GetCameraImage(leftCamera);
+        Texture2D right = GetCameraImage(rightCamera);
 
-        eyeCam.targetTexture = renderTexture;
-        // Render the camera's view.
+        PostImagery(left, right);
+    }
+
+    // Creating new Textures so rapidly leads to filling memory very quickly. 
+    // Take care to ensure they are always eventually garbage collected.
+    // 
+    private Texture2D GetCameraImage(Camera eyeCam) {
+        Texture2D image = new Texture2D(IMAGE_WIDTH, IMAGE_HEIGHT, TextureFormat.RGB24, false);
+
+        eyeCam.targetTexture = rendTex;
         eyeCam.Render();
-        RenderTexture.active = renderTexture;
+        RenderTexture.active = rendTex;
+        image.ReadPixels(new Rect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT), 0, 0);
+        image.Apply();
 
-        image.ReadPixels(rect, 0, 0);
-
-        // reset active camera texture and render texture
+        // reset active camera texture
+        // must set camera target to null, or else game view flashes
         eyeCam.targetTexture = null;
         RenderTexture.active = null;
 
         return image;
     }
+
+    // Send camera imagery over the Network
+    private void PostImagery(Texture2D left, Texture2D right) {
+        System.Action<float, Texture2D, Texture2D> target = Network.User.ReceiveCameraImagery;
+        StartCoroutine(Network.Post(target, Time.time / 1000f, left, right));
+    }
+
+    
 }
