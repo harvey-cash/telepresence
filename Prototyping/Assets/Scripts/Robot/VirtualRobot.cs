@@ -9,8 +9,7 @@ using UnityEngine;
  */
 public class VirtualRobot : TelepresenceRobot
 {
-    public const float CAMERA_FRAME_WAIT = 67f; // time in ms between frames. Roughly 15FPS
-    public const int IMAGE_WIDTH = 1280, IMAGE_HEIGHT = 720;
+    public float CAMERA_FRAME_WAIT = 67f; // time in ms between frames. 67ms --> 15fps.
 
     public Camera leftCamera, rightCamera;
     private RenderTexture rendTex;
@@ -31,7 +30,7 @@ public class VirtualRobot : TelepresenceRobot
     private void CameraSetup() {
         leftCamera.enabled = false;
         rightCamera.enabled = false;
-        rendTex = new RenderTexture(IMAGE_WIDTH, IMAGE_HEIGHT, 24);
+        rendTex = new RenderTexture(Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT, 24);
     }
 
     // Simply call the RTImage coroutine
@@ -44,8 +43,8 @@ public class VirtualRobot : TelepresenceRobot
     WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
     private IEnumerator RTImage() {
         yield return frameEnd;
-        Texture2D left = GetCameraImage(leftCamera);
-        Texture2D right = GetCameraImage(rightCamera);
+        byte[] left = GetCameraImage(leftCamera);
+        byte[] right = GetCameraImage(rightCamera);
 
         PostImagery(left, right);
     }
@@ -53,26 +52,32 @@ public class VirtualRobot : TelepresenceRobot
     // Creating new Textures so rapidly leads to filling memory very quickly. 
     // Take care to ensure they are always eventually garbage collected.
     // 
-    private Texture2D GetCameraImage(Camera eyeCam) {
-        Texture2D image = new Texture2D(IMAGE_WIDTH, IMAGE_HEIGHT, TextureFormat.RGB24, false);
+    private byte[] GetCameraImage(Camera eyeCam) {
+        Texture2D image = new Texture2D(Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT, TextureFormat.RGB24, false);
 
         eyeCam.targetTexture = rendTex;
         eyeCam.Render();
         RenderTexture.active = rendTex;
-        image.ReadPixels(new Rect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT), 0, 0);
-        image.Apply();
+        image.ReadPixels(new Rect(0, 0, Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT), 0, 0);        
+        image.Apply();        
 
         // reset active camera texture
         // must set camera target to null, or else game view flashes
         eyeCam.targetTexture = null;
         RenderTexture.active = null;
 
-        return image;
+        byte[] jpeg = ImageConversion.EncodeToJPG(image);
+
+        // Ensure garbage is collected
+        Destroy(image);
+
+        return jpeg;
     }
 
     // Send camera imagery over the Network
-    private void PostImagery(Texture2D left, Texture2D right) {
-        System.Action<float, Texture2D, Texture2D> target = Network.User.ReceiveCameraImagery;
+    // Encoded as JPEG
+    private void PostImagery(byte[] left, byte[] right) {
+        System.Action<float, byte[], byte[]> target = Network.User.ReceiveCameraImagery;
         StartCoroutine(Network.Post(target, Time.time / 1000f, left, right));
     }
 

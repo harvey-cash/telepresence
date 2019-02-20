@@ -12,7 +12,7 @@ public class Stabilisation
 
     // Pass a delta Pose to the VirtualDisplay, for it to use in the
     // estimation of the Robot's position
-    public void Stabilise (float timestamp, Texture2D left, Texture2D right) {
+    public void Stabilise (float timestamp, byte[] left, byte[] right) {
         // For now, we do no stabilisation
         virtualDisplay.Stabilisation(timestamp, new Pose(Vector3.zero, Quaternion.identity));
     }

@@ -30,7 +30,7 @@ public static class Network {
     }
 
     // Poster provides the address (method) they wish to post to.
-    public static IEnumerator Post(System.Action<float, Texture2D, Texture2D> callBack, float timestamp, Texture2D left, Texture2D right) {
+    public static IEnumerator Post(System.Action<float, byte[], byte[]> callBack, float timestamp, byte[] left, byte[] right) {
         float latency = Random.Range(MIN_LATENCY, MAX_LATENCY);
         yield return new WaitForSeconds(latency / 1000f);
 

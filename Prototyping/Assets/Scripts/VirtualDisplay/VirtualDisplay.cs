@@ -11,10 +11,11 @@ public class VirtualDisplay : MonoBehaviour
 {
     private Renderer rend;
     private Material surface;
+    private Texture2D display;
 
     private Vector3 offset;
 
-    private float timePoseRobot, timePoseStabilise;
+    private float timePoseRobot, timePoseStabilise, timeImage;
     private Pose poseRobot, poseDelta;
 
     private void Start() {
@@ -44,12 +45,22 @@ public class VirtualDisplay : MonoBehaviour
     }
 
     // Combined imagery received from ImageStitcher
-    public void Render(float timestamp, Texture2D imagery) {
-        // GARBAGE COLLECT OLD TEXTURE, ELSE MEMORY WILL FILL VERY QUICKLY
-        Destroy(surface.mainTexture);
+    public void Render(float timestamp, byte[] imagery) {
+        // Ensure image chronology is maintained
+        if (timestamp > timeImage) {
+            timeImage = timestamp;
 
-        surface.mainTexture = imagery;
-        OnRender();
+            // GARBAGE COLLECT FIRST, AS TEXTURES CAUSE MEMORY LEAKS IF SIMPLY
+            // OVERWRITTEN.
+            UnityEngine.Object.Destroy(display);
+
+            display = new Texture2D(Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT, TextureFormat.RGB24, false);
+            display.LoadImage(imagery); // Load JPEG into texture
+            surface.mainTexture = display;
+            OnRender();
+        }
+
+        
     }
 
     // Update pose to most accurate representation, as frame has been rendered

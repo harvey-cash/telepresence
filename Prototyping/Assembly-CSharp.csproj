@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Config.cs" />
     <Compile Include="Assets\Scripts\Imagery\ImageStitcher.cs" />
     <Compile Include="Assets\Scripts\Imagery\Stabilisation.cs" />
     <Compile Include="Assets\Scripts\Network\Network.cs" />

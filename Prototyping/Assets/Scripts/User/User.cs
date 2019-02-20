@@ -39,7 +39,7 @@ public class User : MonoBehaviour {
     }
 
     // Robot Imagery is passed to the ImageStitcher and to Stabilisation
-    public void ReceiveCameraImagery(float timestamp, Texture2D left, Texture2D right) {
+    public void ReceiveCameraImagery(float timestamp, byte[] left, byte[] right) {
         stitcher.StitchThenRender(timestamp, left, right);
         stabilisation.Stabilise(timestamp, left, right);
     }
