@@ -9,11 +9,15 @@ using UnityEngine;
  */
 public class VirtualDisplay : MonoBehaviour
 {
+
+    protected User user;
+    public void SetUser(User user) {
+        this.user = user;
+    }
+
     private Renderer rend;
     private Material surface;
     private Texture2D display;
-
-    private Vector3 offset;
 
     private float timePoseRobot, timePoseStabilise, timeImage;
     private Pose poseRobot, poseDelta;
@@ -21,12 +25,19 @@ public class VirtualDisplay : MonoBehaviour
     private void Start() {
         rend = GetComponent<Renderer>();
         surface = GetComponent<Renderer>().material;
+    }
 
-        offset = transform.position;
+    // In naive telepresence, we stick the display to the user's face
+    private void Update() {
+        if (!Config.DECOUPLE) {
+            Pose viewerPose = user.viewer.GetHeadPose();
+            transform.position = viewerPose.position;
+            transform.rotation = viewerPose.rotation;
+        }
     }
 
     // Received from Robot via Network and User
-    public void ReceiveRobotPose(float timestamp, Pose pose) {
+    public void ReceivePose(float timestamp, Pose pose) {
         // If pose is more recent than stored pose, update
         if (timestamp > timePoseRobot) {
             poseRobot = pose;
@@ -57,15 +68,19 @@ public class VirtualDisplay : MonoBehaviour
             display = new Texture2D(Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT, TextureFormat.RGB24, false);
             display.LoadImage(imagery); // Load JPEG into texture
             surface.mainTexture = display;
-            OnRender();
+
+            // View decoupling
+            UpdatePose();
         }
 
         
     }
 
     // Update pose to most accurate representation, as frame has been rendered
-    private void OnRender() {
-        transform.position = poseRobot.position + poseDelta.position + offset;
-        transform.rotation = poseDelta.rotation * poseRobot.rotation; // remember matrix order
+    private void UpdatePose() {
+        if (Config.DECOUPLE) {
+            transform.position = poseRobot.position + poseDelta.position;
+            transform.rotation = poseRobot.rotation; // ignore delta for now
+        }
     }
 }

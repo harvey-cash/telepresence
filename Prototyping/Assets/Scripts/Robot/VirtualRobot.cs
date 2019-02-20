@@ -10,12 +10,19 @@ using UnityEngine;
 public class VirtualRobot : TelepresenceRobot
 {
     public float CAMERA_FRAME_WAIT = 67f; // time in ms between frames. 67ms --> 15fps.
+    public float POSE_WAIT = 20f;
 
     public Camera leftCamera, rightCamera;
     private RenderTexture rendTex;
 
+    private float timePoseHead;
+
+    // Inverse-Kinematics the robot towards the closest matching head pose
     public override void ReceiveHeadPose(float timestamp, Pose headPose) {
-        // MOVE TOWARDS MATCHING POSE
+        if (timestamp > timePoseHead) {
+            timePoseHead = timestamp;
+            transform.rotation = headPose.rotation; // cheating!
+        }        
     }
 
     private void Start() {
@@ -24,6 +31,8 @@ public class VirtualRobot : TelepresenceRobot
 
         // Post camera imagery repeatedly
         InvokeRepeating("TakeImagery", 1f, CAMERA_FRAME_WAIT / 1000f);
+        // Post head pose repeatedly
+        InvokeRepeating("PostHeadPose", 0, POSE_WAIT / 1000f);
     }
 
     // Disable cameras to avoid unecessary overhead, and create RenderTextures
@@ -79,6 +88,12 @@ public class VirtualRobot : TelepresenceRobot
     private void PostImagery(byte[] left, byte[] right) {
         System.Action<float, byte[], byte[]> target = Network.User.ReceiveCameraImagery;
         StartCoroutine(Network.Post(target, Time.time / 1000f, left, right));
+    }
+
+    private void PostHeadPose() {
+        System.Action<float, Pose> target = Network.User.ReceiveRobotPose;
+        // let's cheat, for now!
+        StartCoroutine(Network.Post(target, Time.time / 1000f, new Pose(transform.position, transform.rotation)));
     }
 
     

@@ -17,12 +17,18 @@ public class User : MonoBehaviour {
     }
 
     private void Start() {
+        display.SetUser(this);
+
         // Create stitcher and stabiliser
         stitcher = new ImageStitcher(display);
         stabilisation = new Stabilisation(display);
 
         // Post head pose
         InvokeRepeating("PostHeadPose", 0, postHeadPoseDelay / 1000f);
+    }
+
+    private void Update() {
+        
     }
 
     // Send head pose over the Network
@@ -35,7 +41,9 @@ public class User : MonoBehaviour {
 
     // Robot Head Pose is forwarded to the VirtualDisplay
     public void ReceiveRobotPose(float timestamp, Pose robotPose) {
-        display.ReceiveRobotPose(timestamp, robotPose);
+
+        // For the time being, center display on headset at all times
+        display.ReceivePose(timestamp, new Pose(viewer.transform.position, robotPose.rotation));
     }
 
     // Robot Imagery is passed to the ImageStitcher and to Stabilisation
