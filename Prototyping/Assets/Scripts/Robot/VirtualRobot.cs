@@ -21,7 +21,9 @@ public class VirtualRobot : TelepresenceRobot
     public override void ReceiveHeadPose(float timestamp, Pose headPose) {
         if (timestamp > timePoseHead) {
             timePoseHead = timestamp;
-            transform.rotation = headPose.rotation; // cheating!
+            
+            // USE INVERSE KINEMATICS TO MOVE TO HEAD POSE
+
         }        
     }
 

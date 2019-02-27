@@ -8,7 +8,7 @@ using UnityEngine;
  */
 public static class Network {
 
-    private const float MIN_LATENCY = 20f, MAX_LATENCY = 200f;
+    private const float MIN_LATENCY = 0f, MAX_LATENCY = 0f;
 
     public static User User { private set; get; }
     public static TelepresenceRobot Robot { private set; get; }

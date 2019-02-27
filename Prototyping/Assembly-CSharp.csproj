@@ -64,8 +64,10 @@
     <Compile Include="Assets\Scripts\Imagery\ImageStitcher.cs" />
     <Compile Include="Assets\Scripts\Imagery\Stabilisation.cs" />
     <Compile Include="Assets\Scripts\Network\Network.cs" />
+    <Compile Include="Assets\Scripts\Robot\InverseKinematics.cs" />
     <Compile Include="Assets\Scripts\Robot\TelepresenceRobot.cs" />
     <Compile Include="Assets\Scripts\Robot\VirtualRobot.cs" />
+    <Compile Include="Assets\Scripts\Robot\VirtualRobotModel.cs" />
     <Compile Include="Assets\Scripts\User\DesktopMonitor.cs" />
     <Compile Include="Assets\Scripts\User\User.cs" />
     <Compile Include="Assets\Scripts\User\Viewer.cs" />
