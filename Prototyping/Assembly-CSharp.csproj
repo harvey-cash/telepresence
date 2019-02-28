@@ -66,7 +66,6 @@
     <Compile Include="Assets\Scripts\Network\Network.cs" />
     <Compile Include="Assets\Scripts\Robot\MotorController.cs" />
     <Compile Include="Assets\Scripts\Robot\NeckKinematics.cs" />
-    <Compile Include="Assets\Scripts\Robot\NeckModel.cs" />
     <Compile Include="Assets\Scripts\Robot\Real\TelepresenceRobot.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\Motor.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\VirtualMotors.cs" />

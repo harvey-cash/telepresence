@@ -10,8 +10,7 @@ public static class NeckKinematics {
      * angles for MIRO's head to match the user's as closely as
      * possible */
     public static float[] FindAngles(Pose targetPose) {
-        // Test
-
+        // Test Movement
         float liftAngle = 0.5f * (Mathf.Sin(Time.time) + 1) * 50;
         float yawAngle = 50;
         float pitchAngle = 0.5f * (Mathf.Cos(Time.time) + 1) * 50;

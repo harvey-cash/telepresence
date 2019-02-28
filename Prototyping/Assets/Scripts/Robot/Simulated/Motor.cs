@@ -12,18 +12,14 @@ public class Motor : MonoBehaviour
 
     // Rotate as told, within the angle limits of the motor
     public void Rotate(float deltaDegrees) {
-        Quaternion rotation = Quaternion.Euler(deltaDegrees * localRotationAxis);
-        transform.localRotation = rotation * transform.localRotation;
+        Quaternion deltaRot = Quaternion.Euler(deltaDegrees * localRotationAxis);
+        Quaternion proposedRot = deltaRot * transform.localRotation;
 
-        /*
-        if (CurrentAngle + deltaDegrees > 0 && CurrentAngle + deltaDegrees < maxAngle) {
+        float proposedDeg = Vector3.Dot(localRotationAxis, proposedRot.eulerAngles);
 
-            transform.localEulerAngles = new Vector3(
-                    transform.localEulerAngles.x,
-                    transform.localEulerAngles.y,
-                    CurrentAngle + deltaDegrees
-            );
+        // Limits
+        if (proposedDeg >= 0 && proposedDeg <= maxAngle) {
+            transform.localRotation = proposedRot;
         }
-        */
     }
 }

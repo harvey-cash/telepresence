@@ -6,11 +6,14 @@ using UnityEngine;
  * current and target angles */
 public static class MotorController
 {
+    const float MAX_SPEED = 10; // degrees per second
 
     public static float DeltaDegrees(float current, float target) {
+        float maxSpeed = MAX_SPEED * Time.deltaTime;
+
         // Simplistic Proportional Movement over time
         float delta = target - current;
-        return delta * Time.deltaTime;
+        return Mathf.Clamp(delta * Time.deltaTime, -maxSpeed, maxSpeed);
     }
 
     // Call for each given DoF (lift, yaw, pitch)
