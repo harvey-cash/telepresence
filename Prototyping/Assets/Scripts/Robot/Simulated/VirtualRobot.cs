@@ -26,9 +26,15 @@ public class VirtualRobot : TelepresenceRobot
 
             // USE INVERSE KINEMATICS TO GET ANGLES
             float[] targetAngles = NeckKinematics.FindAngles(headPose);
+            Debug.Log("TARGET {lift: " + targetAngles[0] + ", yaw: " + targetAngles[1] + ", pitch: " + targetAngles[2] + "}");
 
             // MOVE ROBOT TOWARDS TARGET ANGLES
-            float[] deltaAngles = MotorController.DeltaDegrees(motors.GetCurrentAngles(), targetAngles);
+            float[] currentAngles = motors.GetCurrentAngles();
+            Debug.Log("CURRENT {lift: " + currentAngles[0] + ", yaw: " + currentAngles[1] + ", pitch: " + currentAngles[2] + "}");
+
+            float[] deltaAngles = MotorController.DeltaDegrees(currentAngles, targetAngles);
+            Debug.Log("DELTA {lift: " + deltaAngles[0] + ", yaw: " + deltaAngles[1] + ", pitch: " + deltaAngles[2] + "}");
+
             motors.Rotate(deltaAngles);
             
         }        
@@ -106,9 +112,6 @@ public class VirtualRobot : TelepresenceRobot
 
         // CREATE ROBOT POSE FROM NECK MODEL
         Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
-
-        // Temporarily Cheating
-        robotHeadPose = new Pose(motors.head.position, motors.head.rotation);
 
         StartCoroutine(Network.Post(target, Time.time / 1000f, robotHeadPose));
     }
