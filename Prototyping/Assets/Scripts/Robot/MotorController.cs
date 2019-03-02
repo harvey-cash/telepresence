@@ -6,10 +6,9 @@ using UnityEngine;
  * current and target angles */
 public static class MotorController
 {
-    const float MAX_SPEED = 10; // degrees per second
 
     public static float DeltaDegrees(float current, float target) {
-        float maxSpeed = MAX_SPEED * Time.deltaTime;
+        float maxSpeed = Config.MAX_MOTOR_SPEED_DEG * Time.deltaTime;
 
         // Simplistic Proportional Movement over time
         float delta = target - current;

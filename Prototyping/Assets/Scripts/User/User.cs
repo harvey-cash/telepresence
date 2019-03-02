@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class User : MonoBehaviour {
-    // Time in ms between posting head pose to robot
-    public static float postHeadPoseDelay = 20f;
 
     public VirtualDisplay display;
     public Viewer viewer;
@@ -24,11 +22,7 @@ public class User : MonoBehaviour {
         stabilisation = new Stabilisation(display);
 
         // Post head pose
-        InvokeRepeating("PostHeadPose", 0, postHeadPoseDelay / 1000f);
-    }
-
-    private void Update() {
-        
+        InvokeRepeating("PostHeadPose", 0, Config.POST_HEAD_POSE_MS / 1000f);
     }
 
     // Send head pose over the Network
@@ -39,16 +33,14 @@ public class User : MonoBehaviour {
         StartCoroutine(Network.Post(target, Time.time / 1000f, headPose));
     }
 
-    // Robot Head Pose is forwarded to the VirtualDisplay
-    public void ReceiveRobotPose(float timestamp, Pose robotPose) {
-
-        // For the time being, center display on headset at all times
-        display.ReceivePose(timestamp, new Pose(viewer.transform.position, robotPose.rotation));
-    }
-
     // Robot Imagery is passed to the ImageStitcher and to Stabilisation
-    public void ReceiveCameraImagery(float timestamp, byte[] left, byte[] right) {
-        stitcher.StitchThenRender(timestamp, left, right);
+    public void ReceiveImageryAndPose(float timestamp, byte[] left, byte[] right, Pose pose) {
+        // Center display on user?
+        if (Config.CENTER_DISPLAY_ON_HEAD) {
+            pose = new Pose(viewer.transform.position, pose.rotation);
+        }
+
+        stitcher.StitchThenRender(timestamp, left, right, pose);
         stabilisation.Stabilise(timestamp, left, right);
     }
 }

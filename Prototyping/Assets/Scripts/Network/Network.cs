@@ -8,8 +8,6 @@ using UnityEngine;
  */
 public static class Network {
 
-    private const float MIN_LATENCY = 0f, MAX_LATENCY = 0f;
-
     public static User User { private set; get; }
     public static TelepresenceRobot Robot { private set; get; }
 
@@ -23,17 +21,27 @@ public static class Network {
 
     // Poster provides the address (method) they wish to post to.
     public static IEnumerator Post(System.Action<float,Pose> callBack, float timestamp, Pose pose) {
-        float latency = Random.Range(MIN_LATENCY, MAX_LATENCY);
-        yield return new WaitForSeconds(latency / 1000f);
+        if (Config.SIMULATE_DELAY)
+            yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
 
         callBack(timestamp, pose);
     }
 
     // Poster provides the address (method) they wish to post to.
-    public static IEnumerator Post(System.Action<float, byte[], byte[]> callBack, float timestamp, byte[] left, byte[] right) {
-        float latency = Random.Range(MIN_LATENCY, MAX_LATENCY);
-        yield return new WaitForSeconds(latency / 1000f);
+    public static IEnumerator Post(System.Action<float,byte[],byte[],Pose> callBack, float timestamp, byte[] left, byte[] right, Pose pose) {
+        if (Config.SIMULATE_DELAY)
+            yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
 
-        callBack(timestamp, left, right);
+        callBack(timestamp, left, right, pose);
+    }
+
+    // Get a network delay in ms
+    private static float NetworkDelayMS() {
+        // If simulating noise, then vary between min and max
+        // Else, simply offset by max
+        if (Config.RANDOM_RANGE)
+            return Random.Range(Config.MIN_NETWORK_DELAY_MS, Config.MAX_NETWORK_DELAY_MS);
+        else
+            return Config.MAX_NETWORK_DELAY_MS;
     }
 }

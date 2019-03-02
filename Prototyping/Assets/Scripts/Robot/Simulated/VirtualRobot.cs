@@ -9,15 +9,13 @@ using UnityEngine;
  */
 public class VirtualRobot : TelepresenceRobot
 {
-    public float CAMERA_FRAME_WAIT = 67f; // time in ms between frames. 67ms --> 15fps.
-    public float POSE_WAIT = 20f;
-
     public Camera leftCamera, rightCamera;
     private RenderTexture rendTex;
 
     private float timePoseHead;
 
     private VirtualMotors motors;
+    public Transform headTransform;
 
     // Inverse-Kinematics the robot towards the closest matching head pose
     public override void ReceiveHeadPose(float timestamp, Pose headPose) {
@@ -46,17 +44,16 @@ public class VirtualRobot : TelepresenceRobot
         // Ensure cameras are disabled for manual rendering
         CameraSetup();
 
-        // Post camera imagery repeatedly
-        InvokeRepeating("TakeImagery", 1f, CAMERA_FRAME_WAIT / 1000f);
-        // Post head pose repeatedly
-        InvokeRepeating("PostHeadPose", 0, POSE_WAIT / 1000f);
+        // Record camera imagery repeatedly
+        // Imagery and Pose are automatically posted together
+        InvokeRepeating("TakeImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
     }
 
     // Disable cameras to avoid unecessary overhead, and create RenderTextures
     private void CameraSetup() {
         leftCamera.enabled = false;
         rightCamera.enabled = false;
-        rendTex = new RenderTexture(Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT, 24);
+        rendTex = new RenderTexture(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, 24);
     }
 
     // Simply call the RTImage coroutine
@@ -72,19 +69,19 @@ public class VirtualRobot : TelepresenceRobot
         byte[] left = GetCameraImage(leftCamera);
         byte[] right = GetCameraImage(rightCamera);
 
-        PostImagery(left, right);
+        PostImageryAndPose(left, right);
     }
 
     // Creating new Textures so rapidly leads to filling memory very quickly. 
     // Take care to ensure they are always eventually garbage collected.
     // 
     private byte[] GetCameraImage(Camera eyeCam) {
-        Texture2D image = new Texture2D(Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT, TextureFormat.RGB24, false);
+        Texture2D image = new Texture2D(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, TextureFormat.RGB24, false);
 
         eyeCam.targetTexture = rendTex;
         eyeCam.Render();
         RenderTexture.active = rendTex;
-        image.ReadPixels(new Rect(0, 0, Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT), 0, 0);        
+        image.ReadPixels(new Rect(0, 0, Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT), 0, 0);        
         image.Apply();        
 
         // reset active camera texture
@@ -102,18 +99,16 @@ public class VirtualRobot : TelepresenceRobot
 
     // Send camera imagery over the Network
     // Encoded as JPEG
-    private void PostImagery(byte[] left, byte[] right) {
-        System.Action<float, byte[], byte[]> target = Network.User.ReceiveCameraImagery;
-        StartCoroutine(Network.Post(target, Time.time / 1000f, left, right));
-    }
-
-    private void PostHeadPose() {
-        System.Action<float, Pose> target = Network.User.ReceiveRobotPose;
+    private void PostImageryAndPose(byte[] left, byte[] right) {
+        System.Action<float, byte[], byte[], Pose> target = Network.User.ReceiveImageryAndPose;
 
         // CREATE ROBOT POSE FROM NECK MODEL
-        Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
+        // Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
 
-        StartCoroutine(Network.Post(target, Time.time / 1000f, robotHeadPose));
+        // Unity child hierarchy provides us with a quick means of calculating forward kinematics
+        Pose pose = new Pose(headTransform.position, headTransform.rotation);
+
+        StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
     }
 
     

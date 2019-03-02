@@ -19,30 +19,28 @@ public class VirtualDisplay : MonoBehaviour
     private Material surface;
     private Texture2D display;
 
-    private float timePoseRobot, timePoseStabilise, timeImage;
-    private Pose poseRobot, poseDelta;
+    private float timePoseStabilise, timeImage;
+    private Pose poseDelta;
 
     private void Start() {
         rend = GetComponent<Renderer>();
         surface = GetComponent<Renderer>().material;
-    }
 
-    // In naive telepresence, we stick the display to the user's face
-    private void Update() {
+        // Attach display to viewer
         if (!Config.DECOUPLE) {
-            Pose viewerPose = user.viewer.GetHeadPose();
-            transform.position = viewerPose.position;
-            transform.rotation = viewerPose.rotation;
+            StartCoroutine(WaitThenAttach());
         }
     }
 
-    // Received from Robot via Network and User
-    public void ReceivePose(float timestamp, Pose pose) {
-        // If pose is more recent than stored pose, update
-        if (timestamp > timePoseRobot) {
-            poseRobot = pose;
-            timePoseRobot = timestamp;
-        }
+    // VR Prefab moves things around on the first frame, so if Coupled
+    // We need to wait before setting the display as child
+    private IEnumerator WaitThenAttach() {
+        yield return new WaitForEndOfFrame();
+
+        // In naive telepresence, we stick the display to the user's face
+        transform.parent = user.viewer.GetComponent<Transform>();
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
     }
 
     // Received from Stabilisation
@@ -56,7 +54,7 @@ public class VirtualDisplay : MonoBehaviour
     }
 
     // Combined imagery received from ImageStitcher
-    public void Render(float timestamp, byte[] imagery) {
+    public void Render(float timestamp, byte[] imagery, Pose pose) {
         // Ensure image chronology is maintained
         if (timestamp > timeImage) {
             timeImage = timestamp;
@@ -65,22 +63,20 @@ public class VirtualDisplay : MonoBehaviour
             // OVERWRITTEN.
             UnityEngine.Object.Destroy(display);
 
-            display = new Texture2D(Config.IMAGE_WIDTH, Config.IMAGE_HEIGHT, TextureFormat.RGB24, false);
+            display = new Texture2D(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, TextureFormat.RGB24, false);
             display.LoadImage(imagery); // Load JPEG into texture
             surface.mainTexture = display;
 
-            // View decoupling            
+            // View decoupling
             if (Config.DECOUPLE) {
-                UpdatePose();
+                UpdatePose(pose);
             }
         }
-
-        
     }
 
     // Update pose to most accurate representation, as frame has been rendered
-    private void UpdatePose() {
-        transform.position = poseRobot.position + poseDelta.position;
-        transform.rotation = poseRobot.rotation; // ignore delta for now
+    private void UpdatePose(Pose pose) {
+        transform.position = pose.position;
+        transform.rotation = pose.rotation;
     }
 }

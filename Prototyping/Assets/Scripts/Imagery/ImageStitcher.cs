@@ -11,8 +11,8 @@ public class ImageStitcher
     }
 
     // Send final image to the VirtualDisplay for Rendering
-    public void StitchThenRender(float timestamp, byte[] left, byte[] right) {
+    public void StitchThenRender(float timestamp, byte[] left, byte[] right, Pose pose) {
         // For now, we simply render one of the eyes.
-        virtualDisplay.Render(timestamp, left);
+        virtualDisplay.Render(timestamp, left, pose);
     }
 }
