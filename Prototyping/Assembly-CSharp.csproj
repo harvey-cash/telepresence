@@ -60,14 +60,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\NetMQExample\Scripts\HelloClient.cs" />
+    <Compile Include="Assets\NetMQExample\Scripts\HelloRequester.cs" />
+    <Compile Include="Assets\NetMQExample\Scripts\RunAbleThread.cs" />
     <Compile Include="Assets\Scripts\Config.cs" />
     <Compile Include="Assets\Scripts\Imagery\ImageStitcher.cs" />
     <Compile Include="Assets\Scripts\Imagery\Stabilisation.cs" />
+    <Compile Include="Assets\Scripts\Imagery\StitchingServer.cs" />
     <Compile Include="Assets\Scripts\Network\Network.cs" />
     <Compile Include="Assets\Scripts\Robot\MotorController.cs" />
     <Compile Include="Assets\Scripts\Robot\NeckKinematics.cs" />
     <Compile Include="Assets\Scripts\Robot\Real\TelepresenceRobot.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\Motor.cs" />
+    <Compile Include="Assets\Scripts\Robot\Simulated\StitchRequester.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\VirtualMotors.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\VirtualRobot.cs" />
     <Compile Include="Assets\Scripts\User\DesktopMonitor.cs" />
@@ -423,6 +428,12 @@
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="AsyncIO">
+      <HintPath>D:/SHEFFIELD/TelepresenceDissertation/telepresence/Prototyping/Assets/NetMQExample/Plugins/AsyncIO.dll</HintPath>
+    </Reference>
+    <Reference Include="NetMQ">
+      <HintPath>D:/SHEFFIELD/TelepresenceDissertation/telepresence/Prototyping/Assets/NetMQExample/Plugins/NetMQ.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Advertisements">
       <HintPath>D:/SHEFFIELD/TelepresenceDissertation/telepresence/Prototyping/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.dll</HintPath>
