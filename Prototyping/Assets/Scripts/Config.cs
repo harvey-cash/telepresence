@@ -6,7 +6,7 @@ public static class Config
 {
     // ~~~~~ NETWORK ~~~~~ //
     public static bool SIMULATE_DELAY = true; // Use network delay?
-    public static bool RANDOM_RANGE = true; // If false, use max delay
+    public static bool RANDOM_RANGE = false; // If false, use max delay
     public const float MIN_NETWORK_DELAY_MS = 100f;
     public const float MAX_NETWORK_DELAY_MS = 200f;
 

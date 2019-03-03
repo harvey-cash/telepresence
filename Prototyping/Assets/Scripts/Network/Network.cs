@@ -23,6 +23,8 @@ public static class Network {
     public static IEnumerator Post(System.Action<float,Pose> callBack, float timestamp, Pose pose) {
         if (Config.SIMULATE_DELAY)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
+        else
+            yield return new WaitForEndOfFrame();
 
         callBack(timestamp, pose);
     }
@@ -31,6 +33,8 @@ public static class Network {
     public static IEnumerator Post(System.Action<float,byte[],byte[],Pose> callBack, float timestamp, byte[] left, byte[] right, Pose pose) {
         if (Config.SIMULATE_DELAY)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
+        else
+            yield return new WaitForEndOfFrame();
 
         callBack(timestamp, left, right, pose);
     }
