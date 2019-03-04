@@ -25,4 +25,4 @@ while True:
 
     #  Send reply back to client
     #  In the real world usage, after you finish your work, send your output here
-    socket.send(b"World")
+    socket.send(message)
