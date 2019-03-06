@@ -6,8 +6,6 @@ public class User : MonoBehaviour {
 
     public VirtualDisplay display;
     public Viewer viewer;
-    public ImageStitcher stitcher;
-    public Stabilisation stabilisation;
 
     private void Awake() {
         // Join the network
@@ -16,10 +14,6 @@ public class User : MonoBehaviour {
 
     private void Start() {
         display.SetUser(this);
-
-        // Create stitcher and stabiliser
-        stitcher = new ImageStitcher(display);
-        stabilisation = new Stabilisation(display);
 
         // Post head pose
         InvokeRepeating("PostHeadPose", 0, Config.POST_HEAD_POSE_MS / 1000f);
@@ -33,14 +27,13 @@ public class User : MonoBehaviour {
         StartCoroutine(Network.Post(target, Time.time / 1000f, headPose));
     }
 
-    // Robot Imagery is passed to the ImageStitcher and to Stabilisation
-    public void ReceiveImageryAndPose(float timestamp, byte[] left, byte[] right, Pose pose) {
+    // Stitched Imagery is passed to the display for rendering
+    public void ReceiveImageryAndPose(float timestamp, byte[] stitched, Pose pose) {
         // Center display on user?
         if (Config.CENTER_DISPLAY_ON_HEAD) {
             pose = new Pose(viewer.transform.position, pose.rotation);
         }
 
-        stitcher.StitchThenRender(timestamp, left, right, pose);
-        stabilisation.Stabilise(timestamp, left, right);
+        display.Render(timestamp, stitched, pose);
     }
 }

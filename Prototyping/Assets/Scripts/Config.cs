@@ -4,16 +4,17 @@ using UnityEngine;
 
 public static class Config
 {
+    // ~~~~~ DECOUPLING ~~~~~ //
+
+    public static bool DECOUPLE = true; // Use decoupling technique?
+    public static bool CENTER_DISPLAY_ON_HEAD = true; // Center display position on head?
+
     // ~~~~~ NETWORK ~~~~~ //
-    public static bool SIMULATE_DELAY = true; // Use network delay?
+
+    public static bool SIMULATE_DELAY = false; // Use network delay?
     public static bool RANDOM_RANGE = false; // If false, use max delay
     public const float MIN_NETWORK_DELAY_MS = 100f;
     public const float MAX_NETWORK_DELAY_MS = 200f;
-
-    // ~~~~~ DECOUPLING ~~~~~ //
-
-    public static bool DECOUPLE = false; // Use decoupling technique?
-    public static bool CENTER_DISPLAY_ON_HEAD = true; // Center display position on head?
 
     // ~~~~~ HEAD ~~~~~~ //
 
