@@ -3,6 +3,7 @@ using NetMQ;
 using NetMQ.Sockets;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 /* CODE ADAPTED FROM
@@ -43,7 +44,8 @@ public class StitchRequester : RunAbleThread {
     }
 
     private void PostSendStitch(RequestSocket client) {
-        client.SendFrame(sendStitch.left);
+
+        client.SendFrame(sendStitch.left); // Just left image for now
         float timestamp = sendStitch.timestamp;
         Pose pose = sendStitch.pose;
 

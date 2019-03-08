@@ -5,8 +5,8 @@
 
 import time
 import zmq
-# import cv2
-# import numpy as np
+import cv2
+import numpy as np
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
@@ -18,11 +18,13 @@ print("~~~~~~~   <(-_-)>   ~~~~~~~")
 
 while True:
     #  Wait for next request from client
-    message = socket.recv()
+    message = socket.recv(0, True)
 
     # Split message into left and right images
 
     # Process
 
     #  Send reply back to client
+    # ENCODE TO JPG BYTE STR FOR UNITY
+    # cv2.imencode('.jpg', img)[1].tostring()
     socket.send(message)
