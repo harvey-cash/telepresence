@@ -17,40 +17,6 @@ import miro2 as miro
 
 import zmq
 
-################################################################
-## MAIN
-
-if __name__ == "__main__":
-	main = cam_stream()
-	rospy.init_node("cam_stream")
-
-    context = zmq.Context()
-    socket = context.socket(zmq.REP)
-    socket.bind("tcp://*:5555")
-
-    print("~~ STITCHING SERVER V1.1 ~~")
-    print("~~ I'm doing good work ! ~~")
-    print("~~~~~~~   <(n_n)>   ~~~~~~~")
-
-    while True:
-        #  Wait for next request from client
-        message = socket.recv(0, True)
-        # b = bytearray()
-        # b.extend(message)
-
-        # Split message into left and right images
-        # img = cv2.imdecode(np.array(b), 1);
-        left = main.get_image(0)
-        right = main.get_image(1)
-
-        # Process
-        img = left # temporary
-
-        #  Send reply back to client
-        # ENCODE TO JPG BYTE STR FOR UNITY
-        stitched = cv2.imencode('.jpg', img)[1].tostring()
-        socket.send(stitched)
-
 class cam_stream:
 
 	def __init__(self):
@@ -104,3 +70,36 @@ class cam_stream:
 				# swallow error, silently
 				#print(e)
 				pass
+
+
+################################################################
+## MAIN
+
+if __name__ == "__main__":
+	main = cam_stream()
+	rospy.init_node("cam_stream")
+	context = zmq.Context()
+	socket = context.socket(zmq.REP)
+	socket.bind("tcp://*:5555")
+	print("~~ STITCHING SERVER V1.1 ~~")
+	print("~~ I'm doing good work ! ~~")
+	print("~~~~~~~   <(n_n)>   ~~~~~~~")
+
+	while True:
+		#  Wait for next request from client
+		message = socket.recv(0, True)
+        # b = bytearray()
+        # b.extend(message)
+
+        # Split message into left and right images
+        # img = cv2.imdecode(np.array(b), 1);
+		left = main.get_image(0)
+		right = main.get_image(1)
+
+        # Process
+        img = left # temporary
+
+        #  Send reply back to client
+        # ENCODE TO JPG BYTE STR FOR UNITY
+        stitched = cv2.imencode('.jpg', img)[1].tostring()
+        # socket.send(stitched)
