@@ -30,9 +30,9 @@ class cam_stream:
 		topic_base = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
 
 		# subsribe to cameras
-		self.sub_caml = rospy.Subscriber(topic_base + "sensors/caml",
+		self.sub_caml = rospy.Subscriber(topic_base + "sensors/caml/compressed",
 							CompressedImage, self.callback_caml)
-		self.sub_camr = rospy.Subscriber(topic_base + "sensors/camr",
+		self.sub_camr = rospy.Subscriber(topic_base + "sensors/camr/compressed",
 							CompressedImage, self.callback_camr)
 
 
@@ -41,11 +41,9 @@ class cam_stream:
 		return self.input_camera[i]
 
 	def callback_caml(self, ros_image):
-		print "left eye"
 		self.callback_cam(ros_image, 0)
 
 	def callback_camr(self, ros_image):
-		print "right eye"
 		self.callback_cam(ros_image, 1)
 
 	def callback_cam(self, ros_image, index):
@@ -78,22 +76,22 @@ def stitch(main):
 	while True:
 		#  Wait for next request from client
 		message = socket.recv(0, True)
-		print "Received Request"
-        # b = bytearray()
-        # b.extend(message)
+		# b = bytearray()
+		# b.extend(message)
 
-        # Split message into left and right images
-        # img = cv2.imdecode(np.array(b), 1);
+		# Split message into left and right images
+		# img = cv2.imdecode(np.array(b), 1);
 		left = main.get_image(0)
 		right = main.get_image(1)
 
-        # Process
-        img = left # temporary
+		# Process
+		# img = left # temporary
 
-        #  Send reply back to client
-        # ENCODE TO JPG BYTE STR FOR UNITY
-        stitched = cv2.imencode('.jpg', img)[1].tostring()
-        # socket.send(stitched)
+		#  Send reply back to client
+		# ENCODE TO JPG BYTE STR FOR UNITY
+		stitched = cv2.imencode('.jpg', left)[1].tostring()
+		socket.send(stitched)
+
 
 
 if __name__ == "__main__":

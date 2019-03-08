@@ -35,9 +35,9 @@ class cam_stream:
 		topic_base = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
 
 		# subsribe to cameras
-		self.sub_caml = rospy.Subscriber(topic_base + "sensors/caml",
+		self.sub_caml = rospy.Subscriber(topic_base + "sensors/caml/compressed",
 							CompressedImage, self.callback_caml)
-		self.sub_camr = rospy.Subscriber(topic_base + "sensors/camr",
+		self.sub_camr = rospy.Subscriber(topic_base + "sensors/camr/compressed",
 							CompressedImage, self.callback_camr)
 
 		# get imagery
