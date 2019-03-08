@@ -19,12 +19,15 @@ print("~~~~~~~   <(-_-)>   ~~~~~~~")
 while True:
     #  Wait for next request from client
     message = socket.recv(0, True)
+    b = bytearray()
+    b.extend(message)
 
     # Split message into left and right images
 
     # Process
+    img = cv2.imdecode(np.array(b), 1);
 
     #  Send reply back to client
     # ENCODE TO JPG BYTE STR FOR UNITY
-    # cv2.imencode('.jpg', img)[1].tostring()
-    socket.send(message)
+    stitched = cv2.imencode('.jpg', img)[1].tostring()
+    socket.send(stitched)
