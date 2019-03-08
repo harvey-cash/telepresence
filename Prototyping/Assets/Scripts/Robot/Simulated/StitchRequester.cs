@@ -27,7 +27,8 @@ public class StitchRequester : RunAbleThread {
         ForceDotNet.Force(); // this line is needed to prevent unity freeze after one use, not sure why yet
 
         using (RequestSocket client = new RequestSocket()) {
-            client.Connect("tcp://localhost:5555");
+            //client.Connect("tcp://localhost:5555");
+            client.Connect("tcp://192.168.11.165:5555"); // LAPTOP!
 
             while (Running) {
 
