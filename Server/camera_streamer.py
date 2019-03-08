@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import time
 import os
 
@@ -12,6 +14,7 @@ import numpy as np
 
 import math
 import miro2 as miro
+
 
 class cam_stream:
 
@@ -32,13 +35,13 @@ class cam_stream:
 		topic_base = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
 
 		# subsribe to cameras
-		self.sub_caml = rospy.Subscriber(topic_base + "sensors/caml/compressed",
+		self.sub_caml = rospy.Subscriber(topic_base + "sensors/caml",
 							CompressedImage, self.callback_caml)
-				self.sub_camr = rospy.Subscriber(topic_base + "sensors/camr/compressed",
+		self.sub_camr = rospy.Subscriber(topic_base + "sensors/camr",
 							CompressedImage, self.callback_camr)
 
 		# get imagery
-		GObject.timeout_add(20, self.update_images)
+		self.update_images()
 
 	def update_images(self):
 		# for each camera
@@ -49,25 +52,6 @@ class cam_stream:
 			# Post image here?
 		return True
 
-	# image callbacks
-	def do_auto_camera_zoom(self, image_height):
-
-			if image_height <= 240:
-				self.gui_ResolutionSelection.set_active(2)
-			elif image_height > 600:
-				self.gui_ResolutionSelection.set_active(0)
-			else:
-				self.gui_ResolutionSelection.set_active(1)
-			self.on_ResolutionSelection_changed()
-
-		def do_auto_camera_res(self, shape):
-
-			l = ['240x180', '320x180', '320x240', '480x360', '640x360', '960x720', '1280x720']
-			s = str(shape[1]) + "x" + str(shape[0])
-			for i in range(len(l)):
-				if s == l[i]:
-					self.gui_CapResolutionSelection.set_active(i)
-					return
 
 	def callback_caml(self, ros_image):
 
@@ -83,33 +67,19 @@ class cam_stream:
 				# convert compressed ROS image to raw CV image
 				image = self.image_converter.compressed_imgmsg_to_cv2(ros_image, "rgb8")
 
-				# set camera zoom automatically if has not been set already
-				if not self.auto_camera_zoom is None:
-					h = self.auto_camera_zoom[0]
-					dt = time.time() - self.auto_camera_zoom[1]
-					if h == 0:
-						# initial state, set from first received frame regardless
-						self.do_auto_camera_zoom(image.shape[0])
-						self.auto_camera_zoom = None
-						# for initial frame, also set resolution selector
-						self.do_auto_camera_res(image.shape)
-					elif dt > 4.0:
-						self.auto_camera_zoom = None
-					elif abs(image.shape[0] - h) < 32:
-						self.do_auto_camera_zoom(h)
-						self.auto_camera_zoom = None
-
-				# do zoom
-				if self.camera_zoom == "0.5x":
-					image = cv2.resize(image, (int(image.shape[1] * 0.5), int(image.shape[0] * 0.5)))
-				elif self.camera_zoom == "2x":
-					image = cv2.resize(image, (int(image.shape[1] * 2.0), int(image.shape[0] * 2.0)))
-
 				# store image for display
 				self.input_camera[index] = image
+				cv2.imwrite("./img.jpg", image)
 
 			except CvBridgeError as e:
 
 				# swallow error, silently
 				#print(e)
 				pass
+
+################################################################
+## MAIN
+
+if __name__ == "__main__":
+	main = cam_stream()
+	rospy.init_node("cam_stream")
