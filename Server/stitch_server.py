@@ -2,6 +2,7 @@
 
 import time
 import os
+from threading import Thread
 
 import rospy
 from std_msgs.msg import Float32MultiArray, UInt32MultiArray, UInt16MultiArray, UInt8MultiArray, UInt16, Int16MultiArray, String
@@ -22,13 +23,6 @@ class cam_stream:
 	def __init__(self):
 		# variables to store input data
 		self.input_camera = [None, None]
-		self.t_input_camera = [[], []]
-
-		self.camera_zoom = None
-		self.auto_camera_zoom = [0, 0] # determine zoom from first received frame
-		self.frame_params = [180, '180w', 15]
-		self.meas_fps = ["", ""]
-
 		#Create object to convert ROS images to OpenCV format
 		self.image_converter = CvBridge()
 
@@ -46,13 +40,12 @@ class cam_stream:
 	def get_image(self, i):
 		return self.input_camera[i]
 
-
 	def callback_caml(self, ros_image):
-
+		print "left eye"
 		self.callback_cam(ros_image, 0)
 
 	def callback_camr(self, ros_image):
-
+		print "right eye"
 		self.callback_cam(ros_image, 1)
 
 	def callback_cam(self, ros_image, index):
@@ -74,10 +67,7 @@ class cam_stream:
 
 ################################################################
 ## MAIN
-
-if __name__ == "__main__":
-	main = cam_stream()
-	rospy.init_node("cam_stream")
+def stitch(main):
 	context = zmq.Context()
 	socket = context.socket(zmq.REP)
 	socket.bind("tcp://*:5555")
@@ -88,6 +78,7 @@ if __name__ == "__main__":
 	while True:
 		#  Wait for next request from client
 		message = socket.recv(0, True)
+		print "Received Request"
         # b = bytearray()
         # b.extend(message)
 
@@ -103,3 +94,11 @@ if __name__ == "__main__":
         # ENCODE TO JPG BYTE STR FOR UNITY
         stitched = cv2.imencode('.jpg', img)[1].tostring()
         # socket.send(stitched)
+
+
+if __name__ == "__main__":
+	main = cam_stream()
+	rospy.init_node("cam_stream")
+
+	thread = Thread(target=stitch, args=(main,))
+	thread.start()
