@@ -54,10 +54,8 @@ class cam_stream:
 
 				# store image for display
 				self.input_camera[index] = image
-				cv2.imwrite("./img.jpg", image)
 
 			except CvBridgeError as e:
-
 				# swallow error, silently
 				#print(e)
 				pass
