@@ -67,24 +67,43 @@ class client:
 		# Publish imagery and robot head pose
 		self.socket_pub = self.context.socket(zmq.PUB)
 		self.socket_pub.bind("tcp://*:5555") # Send on this port
+
 		# Subscribe to head tracking data
-		self.socket_sub = self.context.socket(zmq.SUB)
-		self.socket_sub.connect("tcp://localhost:5556") # Receive on this port
-		## TODO: zmq.Poller() ?
+		self.socket_sub = self.context.socket(zmq.REP)
+		self.socket_sub.bind("tcp://*:5556") # Receive on this port
+
+		"""
+		# Set receive filters
+		self.socket_sub.setsockopt_string(zmq.SUBSCRIBE, "LIFT".decode('ascii'))
+		self.socket_sub.setsockopt_string(zmq.SUBSCRIBE, "YAW".decode('ascii'))
+		self.socket_sub.setsockopt_string(zmq.SUBSCRIBE, "PITCH".decode('ascii'))
+
+		# I'll be honest, I'm not yet sure what this does
+		self.poller = zmq.Poller()
+		self.poller.register(self.socket_sub, zmq.POLLIN)
+		"""
 
 		# Test controlling yaw on separate thread
-		self.thread_control = Thread(target=self.yaw_thread)
+		self.thread_control = Thread(target=self.receive_head_tracking)
 
 
     # ~~~~~~~~~ MOTOR FEEDBACK AND CONTROL ~~~~~~~~ #
 
 	# Test controlling joints
-	def yaw_thread(self):
+	def receive_head_tracking(self):
 		while True:
-			angle = math.sin(time.time())
-			print angle
-			self.move_head(0, angle, 0);
-			time.sleep(0.5)
+			message = self.socket_sub.recv(0, True)
+			print message
+
+			self.socket_sub.send("Thanks.")
+
+			"""
+			socks = dict(self.poller.poll())
+			if self.socket_sub in socks and socks[self.socket_sub] == zmq.POLLIN:
+				[dof, rads] = self.socket_sub.recv_multipart()
+				print dof + ": " + rads
+			"""
+
 
 	# Try to match user's head pose
 	def move_head(self, liftAngle, yawAngle, pitchAngle):
