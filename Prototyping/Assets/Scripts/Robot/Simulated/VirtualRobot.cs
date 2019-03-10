@@ -25,7 +25,7 @@ public class VirtualRobot : TelepresenceRobot
 
         // Record camera imagery repeatedly
         // Imagery and Pose are automatically posted together
-        InvokeRepeating("TakeImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
+        // InvokeRepeating("TakeImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
     }
 
     // Inverse-Kinematics the robot towards the closest matching head pose
