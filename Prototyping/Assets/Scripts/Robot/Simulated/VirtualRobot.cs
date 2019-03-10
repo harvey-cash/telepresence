@@ -25,7 +25,7 @@ public class VirtualRobot : TelepresenceRobot
 
         // Record camera imagery repeatedly
         // Imagery and Pose are automatically posted together
-        // InvokeRepeating("TakeImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
+        InvokeRepeating("TakeImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
     }
 
     // Inverse-Kinematics the robot towards the closest matching head pose
@@ -101,7 +101,8 @@ public class VirtualRobot : TelepresenceRobot
     // Encoded as JPEG
     private void PostImageryAndPose(byte[] left, byte[] right) {
         // Post images to Stitching Server
-        System.Action<float, byte[], byte[], Pose> target = Network.Server.ReceiveImageryAndPose;
+        // System.Action<float, byte[], byte[], Pose> target = Network.Server.ReceiveImageryAndPose;
+        System.Action<float, byte[], Pose> target = Network.User.ReceiveImageryAndPose;
 
         // CREATE ROBOT POSE FROM NECK MODEL
         // Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
@@ -110,7 +111,8 @@ public class VirtualRobot : TelepresenceRobot
         Pose pose = new Pose(headTransform.position, headTransform.rotation);
 
         // Simulate network delay
-        StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
+        // StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
+        StartCoroutine(Network.Post(target, Time.time / 1000f, left, pose));
     }
 
     

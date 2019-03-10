@@ -10,7 +10,6 @@ using UnityEngine;
 public class StitchingServer : MonoBehaviour {
 
     User user;
-    List<SendStitch> sendQueue; // as frames come in, add them to the queue
     StitchRequester stitchRequester;
 
     private void Awake() {
@@ -19,8 +18,6 @@ public class StitchingServer : MonoBehaviour {
 
     private void Start() {
         user = Network.User;
-
-        sendQueue = new List<SendStitch>();
 
         stitchRequester = new StitchRequester();
         stitchRequester.Start();
