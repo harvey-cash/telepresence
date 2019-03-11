@@ -10,13 +10,17 @@ public static class Network {
 
     public static User User { private set; get; }
     public static TelepresenceRobot Robot { private set; get; }
+    public static StitchingServer Server { private set; get; }
 
-    // Overloaded methods to allow any Robot or User to join
+    // Overloaded methods to allow any Robot, User, or Server to join
     public static void Join(User u) {
         User = u;
     }
     public static void Join(TelepresenceRobot r) {
         Robot = r;
+    }
+    public static void Join(StitchingServer s) {
+        Server = s;
     }
 
     // Poster provides the address (method) they wish to post to.
@@ -37,6 +41,16 @@ public static class Network {
             yield return new WaitForEndOfFrame();
 
         callBack(timestamp, left, right, pose);
+    }
+
+    // Poster provides the address (method) they wish to post to.
+    public static IEnumerator Post(System.Action<float, byte[], Pose> callBack, float timestamp, byte[] left, Pose pose) {
+        if (Config.SIMULATE_DELAY)
+            yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
+        else
+            yield return new WaitForEndOfFrame();
+
+        callBack(timestamp, left, pose);
     }
 
     // Get a network delay in ms

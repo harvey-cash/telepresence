@@ -17,6 +17,26 @@ public class VirtualRobot : TelepresenceRobot
     private VirtualMotors motors;
     public Transform headTransform;
 
+    private void Awake() {
+        if (!Config.USE_MIRO_SERVER) {
+            Network.Join(this);
+        }
+        else {
+            Destroy(this);
+        }
+    }
+
+    private void Start() {
+        motors = GetComponent<VirtualMotors>(); // affect the state of our robot model
+
+        // Ensure cameras are disabled for manual rendering
+        CameraSetup();
+
+        // Record camera imagery repeatedly
+        // Imagery and Pose are automatically posted together
+        InvokeRepeating("TakeImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
+    }
+
     // Inverse-Kinematics the robot towards the closest matching head pose
     public override void ReceiveHeadPose(float timestamp, Pose headPose) {
         if (timestamp > timePoseHead) {
@@ -36,17 +56,6 @@ public class VirtualRobot : TelepresenceRobot
             motors.Rotate(deltaAngles);
             
         }        
-    }
-
-    private void Start() {
-        motors = GetComponent<VirtualMotors>(); // affect the state of our robot model
-
-        // Ensure cameras are disabled for manual rendering
-        CameraSetup();
-
-        // Record camera imagery repeatedly
-        // Imagery and Pose are automatically posted together
-        InvokeRepeating("TakeImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
     }
 
     // Disable cameras to avoid unecessary overhead, and create RenderTextures
@@ -100,7 +109,9 @@ public class VirtualRobot : TelepresenceRobot
     // Send camera imagery over the Network
     // Encoded as JPEG
     private void PostImageryAndPose(byte[] left, byte[] right) {
-        System.Action<float, byte[], byte[], Pose> target = Network.User.ReceiveImageryAndPose;
+        // Post images to Stitching Server
+        System.Action<float, byte[], byte[], Pose> target = Network.Server.ReceiveImageryAndPose;
+        //System.Action<float, byte[], Pose> target = Network.User.ReceiveImageryAndPose;
 
         // CREATE ROBOT POSE FROM NECK MODEL
         // Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
@@ -108,7 +119,9 @@ public class VirtualRobot : TelepresenceRobot
         // Unity child hierarchy provides us with a quick means of calculating forward kinematics
         Pose pose = new Pose(headTransform.position, headTransform.rotation);
 
+        // Simulate network delay
         StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
+        //StartCoroutine(Network.Post(target, Time.time / 1000f, left, pose));
     }
 
     
