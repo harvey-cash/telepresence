@@ -8,18 +8,17 @@ using UnityEngine;
 public class SocketPublisher : RunAbleThread
 {
 
+    public string targetAngles = "{lift: 0.0, yaw: 0.0, pitch: 0.0}";
+
     protected override void Run() {
 
         ForceDotNet.Force(); // prevent unity freeze after one use
 
-        using (RequestSocket socketPub = new RequestSocket()) {
-            //client
-            socketPub.Connect("tcp://192.168.11.165:5556"); // LAPTOP!
+        using (RequestSocket socket = new RequestSocket()) {
+            socket.Connect(Config.POST_HEAD_IP);
 
-            while (Running) {
-
-                Debug.Log(Send(socketPub, "Here."));
-
+            while (Running) {                
+                Debug.Log(Send(socket, targetAngles));
             }
         }
 
@@ -29,16 +28,19 @@ public class SocketPublisher : RunAbleThread
     private string Send(RequestSocket socket, string send) {
 
         socket.SendFrame(send);
+        Debug.Log("sent");
 
         // Wait for response
         string response = null;
-        bool gotResponse = false;
+        /*
+        bool gotResponse = false;        
         while (Running) {
             gotResponse = socket.TryReceiveFrameString(out response);
             if (gotResponse) {
                 break;
             }
         }
-        return response;
+        */
+        return response = socket.ReceiveFrameString();
     }
 }

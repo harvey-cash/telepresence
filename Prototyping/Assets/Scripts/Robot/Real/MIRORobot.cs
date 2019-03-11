@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MIRORobot : MonoBehaviour
+public class MIRORobot : TelepresenceRobot
 {
     private SocketPublisher miroComms;
 
@@ -13,13 +13,20 @@ public class MIRORobot : MonoBehaviour
         miroComms.Start();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    private void Awake() {
+        if (Config.USE_MIRO_SERVER)
+            Network.Join(this);
     }
 
     private void OnDestroy() {
         miroComms.Stop();
+    }
+
+    public override void ReceiveHeadPose(float timestamp, Pose headPose) {
+        // USE INVERSE KINEMATICS TO GET ANGLES
+        float[] targetAngles = NeckKinematics.FindRadAngles(headPose);
+
+        string jsonAngles = "{lift: " + targetAngles[0] + ", yaw: " + targetAngles[1] + ", pitch: " + targetAngles[2] + "}";
+        miroComms.targetAngles = jsonAngles;
     }
 }

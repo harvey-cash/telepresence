@@ -6,6 +6,16 @@ using UnityEngine;
  * required to place the head at a specific pose
  */
 public static class NeckKinematics {
+
+    // Overload to get angles in radians
+    public static float[] FindRadAngles(Pose targetPose) {
+        float[] angles = FindAngles(targetPose);
+        for (int i = 0; i < angles.Length; i++) {
+            angles[i] = Mathf.Deg2Rad * angles[i];
+        }
+        return angles;
+    }
+
     /* This method returns an array [lift, yaw, pitch] of target
      * angles for MIRO's head to match the user's as closely as
      * possible */

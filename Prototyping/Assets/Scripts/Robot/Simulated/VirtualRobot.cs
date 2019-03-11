@@ -17,6 +17,11 @@ public class VirtualRobot : TelepresenceRobot
     private VirtualMotors motors;
     public Transform headTransform;
 
+    private void Awake() {
+        if(!Config.USE_MIRO_SERVER)
+            Network.Join(this);
+    }
+
     private void Start() {
         motors = GetComponent<VirtualMotors>(); // affect the state of our robot model
 
