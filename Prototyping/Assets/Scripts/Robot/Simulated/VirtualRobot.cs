@@ -18,8 +18,12 @@ public class VirtualRobot : TelepresenceRobot
     public Transform headTransform;
 
     private void Awake() {
-        if(!Config.USE_MIRO_SERVER)
+        if (!Config.USE_MIRO_SERVER) {
             Network.Join(this);
+        }
+        else {
+            Destroy(this);
+        }
     }
 
     private void Start() {
@@ -106,8 +110,8 @@ public class VirtualRobot : TelepresenceRobot
     // Encoded as JPEG
     private void PostImageryAndPose(byte[] left, byte[] right) {
         // Post images to Stitching Server
-        // System.Action<float, byte[], byte[], Pose> target = Network.Server.ReceiveImageryAndPose;
-        System.Action<float, byte[], Pose> target = Network.User.ReceiveImageryAndPose;
+        System.Action<float, byte[], byte[], Pose> target = Network.Server.ReceiveImageryAndPose;
+        //System.Action<float, byte[], Pose> target = Network.User.ReceiveImageryAndPose;
 
         // CREATE ROBOT POSE FROM NECK MODEL
         // Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
@@ -116,8 +120,8 @@ public class VirtualRobot : TelepresenceRobot
         Pose pose = new Pose(headTransform.position, headTransform.rotation);
 
         // Simulate network delay
-        // StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
-        StartCoroutine(Network.Post(target, Time.time / 1000f, left, pose));
+        StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
+        //StartCoroutine(Network.Post(target, Time.time / 1000f, left, pose));
     }
 
     

@@ -7,8 +7,8 @@ using UnityEngine;
 
 public class SocketPublisher : RunAbleThread
 {
-
-    public string targetAngles = "{lift: 0.0, yaw: 0.0, pitch: 0.0}";
+    public bool sendData = true;
+    public string targetAngles = "{\"lift\": 0.0, \"yaw\": 0.0, \"pitch\": 0.0}";
 
     protected override void Run() {
 
@@ -17,8 +17,11 @@ public class SocketPublisher : RunAbleThread
         using (RequestSocket socket = new RequestSocket()) {
             socket.Connect(Config.POST_HEAD_IP);
 
-            while (Running) {                
-                Debug.Log(Send(socket, targetAngles));
+            while (Running) {   
+                if (sendData) {
+                    sendData = false;
+                    Debug.Log(Send(socket, targetAngles));
+                }                
             }
         }
 
@@ -28,11 +31,10 @@ public class SocketPublisher : RunAbleThread
     private string Send(RequestSocket socket, string send) {
 
         socket.SendFrame(send);
-        Debug.Log("sent");
+        Debug.Log("SENT: " + send);
 
         // Wait for response
         string response = null;
-        /*
         bool gotResponse = false;        
         while (Running) {
             gotResponse = socket.TryReceiveFrameString(out response);
@@ -40,7 +42,7 @@ public class SocketPublisher : RunAbleThread
                 break;
             }
         }
-        */
-        return response = socket.ReceiveFrameString();
+        sendData = true;
+        return response;
     }
 }
