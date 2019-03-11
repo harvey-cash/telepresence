@@ -65,43 +65,30 @@ class client:
 		# ~~~~~~~~~ UNITY PyZMQ CONNECTIONS ~~~~~~~~~ #
 
 		self.context = zmq.Context()
-		# Publish imagery and robot head pose
-		# self.socket_pub = self.context.socket(zmq.PUB)
-		# self.socket_pub.bind("tcp://*:5556") # Send on this port
 
-		"""
-		# Set receive filters
-		self.socket_sub.setsockopt_string(zmq.SUBSCRIBE, "LIFT".decode('ascii'))
-		self.socket_sub.setsockopt_string(zmq.SUBSCRIBE, "YAW".decode('ascii'))
-		self.socket_sub.setsockopt_string(zmq.SUBSCRIBE, "PITCH".decode('ascii'))
-
-		# I'll be honest, I'm not yet sure what this does
-		self.poller = zmq.Poller()
-		self.poller.register(self.socket_sub, zmq.POLLIN)
-		"""
-
-		# Test controlling yaw on separate thread
+		# Receive head tracking and push imagery on separate threads
 		self.thread_control = Thread(target=self.receive_head_tracking)
+		self.thread_imagery = Thread(target=self.send_imagery_and_pose)
 
 
     # ~~~~~~~~~ MOTOR FEEDBACK AND CONTROL ~~~~~~~~ #
 
-	# Test controlling joints
+	# Listen for head tracking data
 	def receive_head_tracking(self):
-		print "Thread started..."
+		print "Head tracking thread started..."
 
 		# Subscribe to head tracking data
-		self.socket_sub = self.context.socket(zmq.REP)
-		self.socket_sub.bind("tcp://*:5555") # Receive on this port
+		self.socket_head_data = self.context.socket(zmq.REP)
+		self.socket_head_data.bind("tcp://*:5555") # Receive on this port
 
 		while True:
 
-			message = self.socket_sub.recv(0, True)
+			message = self.socket_head_data.recv(0, True)
 			data = ast.literal_eval(message)
 
 			self.move_head(data["lift"], data["yaw"], data["pitch"])
 
-			self.socket_sub.send("1")
+			self.socket_head_data.send("1")
 
 
 	# Try to match user's head pose
@@ -124,6 +111,28 @@ class client:
 
 	# ~~~~~~~~~ IMAGERY AND POSE ~~~~~~~~ #
 
+	# Listen for imagery request
+	def send_imagery_and_pose(self):
+		print "Imagery thread started..."
+
+		# Wait then send imagery
+		self.socket_imagery = self.context.socket(zmq.REP)
+		self.socket_imagery.bind("tcp://*:5556") # Receive on this port
+
+		while True:
+
+			message = self.socket_imagery.recv(0, True)
+
+			# Get left and right images
+			left = self.input_camera[0]
+			right = self.input_camera[1]
+
+			# Stitch images using OpenCV
+
+			#  Send to client along with pose
+			# ENCODE TO JPG BYTE STR FOR UNITY
+			stitched = cv2.imencode('.jpg', left)[1].tostring()
+			self.socket_imagery.send(stitched)
 
 
     # ~~~~~~~~~ CALLBACKS ~~~~~~~~~ #
@@ -159,3 +168,4 @@ if __name__ == "__main__":
 	rospy.init_node("client")
 
 	client.thread_control.start()
+	client.thread_imagery.start()
