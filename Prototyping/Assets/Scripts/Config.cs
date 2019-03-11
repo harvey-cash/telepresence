@@ -11,8 +11,8 @@ public static class Config
 
     // ~~~~~ NETWORK ~~~~~ //
 
-    public const string POST_HEAD_IP = "tcp://192.168.11.165:5555";
-    public const string GET_IMAGERY_IP = "";
+    public const string POST_HEAD_IP = "tcp://192.168.11.165:5555"; //5
+    public const string GET_IMAGERY_IP = "tcp://192.168.11.165:5556"; //6
 
     // ~~~~~ SIMULATED NETWORK ~~~~~ //
 

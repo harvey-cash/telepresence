@@ -71,7 +71,8 @@
     <Compile Include="Assets\Scripts\Robot\MotorController.cs" />
     <Compile Include="Assets\Scripts\Robot\NeckKinematics.cs" />
     <Compile Include="Assets\Scripts\Robot\Real\MIRORobot.cs" />
-    <Compile Include="Assets\Scripts\Robot\Real\SocketPublisher.cs" />
+    <Compile Include="Assets\Scripts\Robot\Real\RequestImagery.cs" />
+    <Compile Include="Assets\Scripts\Robot\Real\SendHeadtracking.cs" />
     <Compile Include="Assets\Scripts\Robot\Real\TelepresenceRobot.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\Motor.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\StitchRequester.cs" />
