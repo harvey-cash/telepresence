@@ -21,6 +21,7 @@ import math
 import miro2 as miro
 
 import zmq
+import ast
 
 #Generate a fake enum for joint arrays
 tilt, lift, yaw, pitch = range(4)
@@ -65,12 +66,8 @@ class client:
 
 		self.context = zmq.Context()
 		# Publish imagery and robot head pose
-		self.socket_pub = self.context.socket(zmq.PUB)
-		self.socket_pub.bind("tcp://*:5555") # Send on this port
-
-		# Subscribe to head tracking data
-		self.socket_sub = self.context.socket(zmq.REP)
-		self.socket_sub.bind("tcp://*:5556") # Receive on this port
+		# self.socket_pub = self.context.socket(zmq.PUB)
+		# self.socket_pub.bind("tcp://*:5556") # Send on this port
 
 		"""
 		# Set receive filters
@@ -91,18 +88,20 @@ class client:
 
 	# Test controlling joints
 	def receive_head_tracking(self):
+		print "Thread started..."
+
+		# Subscribe to head tracking data
+		self.socket_sub = self.context.socket(zmq.REP)
+		self.socket_sub.bind("tcp://*:5555") # Receive on this port
+
 		while True:
+
 			message = self.socket_sub.recv(0, True)
-			print message
+			data = ast.literal_eval(message)
 
-			self.socket_sub.send("Thanks.")
+			self.move_head(data["lift"], data["yaw"], data["pitch"])
 
-			"""
-			socks = dict(self.poller.poll())
-			if self.socket_sub in socks and socks[self.socket_sub] == zmq.POLLIN:
-				[dof, rads] = self.socket_sub.recv_multipart()
-				print dof + ": " + rads
-			"""
+			self.socket_sub.send("1")
 
 
 	# Try to match user's head pose
