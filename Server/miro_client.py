@@ -22,6 +22,7 @@ import miro2 as miro
 
 import zmq
 import ast
+import struct
 
 #Generate a fake enum for joint arrays
 tilt, lift, yaw, pitch = range(4)
@@ -165,11 +166,19 @@ class client:
 
 			# Stitch images using OpenCV
 
-			#  Send to client along with pose
 			# ENCODE TO JPG BYTE STR FOR UNITY
-			stitched = cv2.imencode('.jpg', left)[1].tostring()
+			stitched = bytearray(cv2.imencode('.jpg', left)[1].tostring())
 
-			self.socket_imagery.send(stitched)
+			# Compose protocol
+			# BYTE ORDER: [IMAGE LENGTH BYTES][IMAGE BYTES][POSE BYTES]
+			imageLengthBytes = bytearray(struct.pack('h', len(stitched)))
+
+			stringRot = np.array2string(vecw, separator=',')
+			poseBytes = bytearray(stringRot)
+
+			# Concatenate and send
+			messageBytes = imageLengthBytes + stitched + poseBytes
+			self.socket_imagery.send(messageBytes)
 
 
     # ~~~~~~~~~ CALLBACKS ~~~~~~~~~ #
