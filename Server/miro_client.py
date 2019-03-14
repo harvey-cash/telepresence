@@ -22,6 +22,7 @@ import miro2 as miro
 
 import zmq
 import ast
+import struct
 
 #Generate a fake enum for joint arrays
 tilt, lift, yaw, pitch = range(4)
@@ -29,6 +30,10 @@ tilt, lift, yaw, pitch = range(4)
 class client:
 
 	def __init__(self):
+
+		# ~~~~~~~~~ DEBUGGING ~~~~~~~~~ #
+
+		# self.check = True
 
 		# ~~~~~~~~~ LOCAL FIELDS ~~~~~~~~~ #
 
@@ -42,6 +47,21 @@ class client:
 
 		# Create object to convert ROS images to OpenCV format
 		self.image_converter = CvBridge()
+
+		# ~~~~~~~~~~~ KINEMATICS ~~~~~~~~~~~ #
+
+		# create kc object with default (calibration) configuration
+		# of joints (and zeroed pose of FOOT in WORLD)
+		self.kc = miro.utils.kc_interf.kc_miro()
+
+		# create objects in HEAD
+		self.pos = miro.utils.get("LOC_NOSE_TIP_HEAD")
+		self.vec = np.array([1.0, 0.0, 0.0])
+
+		# transform to WORLD (note use of "Abs" and "Rel"
+		# for positions and directions, respectively)
+		self.posw = self.kc.changeFrameAbs(miro.constants.LINK_HEAD, miro.constants.LINK_WORLD, self.pos)
+		self.vecw = self.kc.changeFrameRel(miro.constants.LINK_HEAD, miro.constants.LINK_WORLD, self.vec)
 
 		# robot name
 		topic_base = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
@@ -99,6 +119,7 @@ class client:
 		# move head to angles
 		self.pub_kin.publish(self.kin_joints)
 
+
 	# MIRO seems to handle moving to a specified joint position
 	# so may not need these in the end
 	def get_joint_angles(self):
@@ -107,6 +128,19 @@ class client:
 		self.LiftMeasured.set_value(math.degrees(joints[1]))
 		self.YawMeasured.set_value(math.degrees(joints[2]))
 		self.PitchMeasured.set_value(math.degrees(joints[3]))
+
+
+	# update configuration based on data
+	def forward_kinematics(self):
+		# NB: the immobile joint "TILT" is always at the same
+		# angle, "TILT_RAD_CALIB"
+		joints = self.input_package.kinematic_joints.position
+		kinematic_joints = np.array([miro.constants.TILT_RAD_CALIB, joints[1], joints[2], joints[3]])
+		self.kc.setConfig(kinematic_joints)
+
+		# transform to WORLD
+		self.posw = self.kc.changeFrameAbs(miro.constants.LINK_HEAD, miro.constants.LINK_WORLD, self.pos)
+		self.vecw = self.kc.changeFrameRel(miro.constants.LINK_HEAD, miro.constants.LINK_WORLD, self.vec)
 
 
 	# ~~~~~~~~~ IMAGERY AND POSE ~~~~~~~~ #
@@ -126,20 +160,38 @@ class client:
 			# Get left and right images
 			left = self.input_camera[0]
 			right = self.input_camera[1]
+			# World position and rotation (of head?)
+			posw = self.posw
+			vecw = self.vecw
 
 			# Stitch images using OpenCV
 
-			#  Send to client along with pose
 			# ENCODE TO JPG BYTE STR FOR UNITY
-			stitched = cv2.imencode('.jpg', left)[1].tostring()
-			self.socket_imagery.send(stitched)
+			stitched = bytearray(cv2.imencode('.jpg', left)[1].tostring())
+
+			# Compose protocol
+			# BYTE ORDER: [IMAGE LENGTH BYTES][IMAGE BYTES][POSE BYTES]
+			imageLengthBytes = bytearray(struct.pack('h', len(stitched)))
+
+			stringRot = np.array2string(vecw, separator=',')
+			poseBytes = bytearray(stringRot)
+
+			# Concatenate and send
+			messageBytes = imageLengthBytes + stitched + poseBytes
+			self.socket_imagery.send(messageBytes)
 
 
     # ~~~~~~~~~ CALLBACKS ~~~~~~~~~ #
 
+	# Body pose
+	def callback_pose(self, msg):
+		self.body_pose = msg
+		print msg
+
 	# All sensor data
 	def callback_package(self, msg):
 		self.input_package = msg
+		self.forward_kinematics()
 
     # Left and right camera imagery
 	def callback_caml(self, ros_image):
