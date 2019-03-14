@@ -6,7 +6,7 @@ public static class Config
 {
     // ~~~~~ DECOUPLING ~~~~~ //
 
-    public static bool DECOUPLE = false; // Use decoupling technique?
+    public static bool DECOUPLE = true; // Use decoupling technique?
     public static bool CENTER_DISPLAY_ON_HEAD = true; // Center display position on head?
 
     // ~~~~~ NETWORK ~~~~~ //

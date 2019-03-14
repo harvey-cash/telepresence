@@ -49,7 +49,7 @@ public class MIRORobot : TelepresenceRobot
     // No need to simulate network delay, as already accounted for by the robot posting
     // to the stitching server
     private void GetImagery() {
-        Pose pose = new Pose(Vector3.zero, Quaternion.identity); // temp
+        Pose pose = new Pose(Vector3.zero, miroImagery.poseRot);
 
         user.ReceiveImageryAndPose(Time.time, miroImagery.stitched, pose);
     }
