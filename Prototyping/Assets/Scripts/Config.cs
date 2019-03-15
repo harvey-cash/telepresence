@@ -6,7 +6,8 @@ public static class Config
 {
     // ~~~~~ DECOUPLING ~~~~~ //
 
-    public static bool DECOUPLE = true; // Use decoupling technique?
+    public static bool USE_VR = true; // VR or desktop?
+    public static bool DECOUPLE = true && USE_VR; // Use decoupling technique? (only for VR!)
     public static bool CENTER_DISPLAY_ON_HEAD = true; // Center display position on head?
 
     // ~~~~~ NETWORK ~~~~~ //
@@ -21,13 +22,17 @@ public static class Config
     public const float MIN_NETWORK_DELAY_MS = 100f;
     public const float MAX_NETWORK_DELAY_MS = 200f;
 
-    // ~~~~~ HEAD ~~~~~~ //
+    // ~~~~~ DISPLAY ~~~~~ //
 
+    public static bool CURVED_DISPLAY = false;
+
+    // ~~~~~ HEAD ~~~~~~ //
+    
     public const float POST_HEAD_POSE_MS = 20; // Post head pose to robot every x ms
 
     // ~~~~~ ROBOT ~~~~~ //
 
-    public static bool USE_MIRO_SERVER = true;
+    public static bool USE_MIRO_SERVER = false;
     
     public const int ROBOT_IMAGE_WIDTH = 1280, ROBOT_IMAGE_HEIGHT = 720; // Eye imagery from the robot
     public const float ROBOT_FRAME_WAIT_MS = 67f; // time in ms between frames. 67ms --> 15fps.

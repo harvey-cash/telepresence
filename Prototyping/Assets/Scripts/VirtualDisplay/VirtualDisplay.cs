@@ -7,24 +7,24 @@ using UnityEngine;
  * Ideally, the display position should be accurate for the camera
  * imagery renderered to it.
  */
-public class VirtualDisplay : MonoBehaviour
+public abstract class VirtualDisplay : MonoBehaviour
 {
+    protected Renderer rend;
+    protected Material surface;
+    public abstract void SetRendAndSurface();
 
     protected User user;
     public void SetUser(User user) {
         this.user = user;
     }
-
-    private Renderer rend;
-    private Material surface;
+    
     private Texture2D display;
 
     private float timePoseStabilise, timeImage;
     private Pose poseDelta;
 
     private void Start() {
-        rend = GetComponent<Renderer>();
-        surface = GetComponent<Renderer>().material;
+        SetRendAndSurface();
 
         // Attach display to viewer
         if (!Config.DECOUPLE) {

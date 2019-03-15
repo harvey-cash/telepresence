@@ -13,6 +13,8 @@ public class User : MonoBehaviour {
     }
 
     private void Start() {
+        viewer = Network.Viewer;
+        display = Network.Display;
         display.SetUser(this);
 
         // Post head pose

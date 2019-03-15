@@ -33,7 +33,9 @@ public class MIRORobot : TelepresenceRobot
     }
 
     private void OnDestroy() {
-        miroComms.Stop();
+        if (miroComms != null) {
+            miroComms.Stop();
+        }        
     }
 
     public override void ReceiveHeadPose(float timestamp, Pose headPose) {

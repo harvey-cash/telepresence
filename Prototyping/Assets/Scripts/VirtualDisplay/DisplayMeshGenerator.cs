@@ -12,18 +12,17 @@ public class DisplayMeshGenerator : MonoBehaviour {
     public int xVerts = 32, yVerts = 18;
     private float xDelta, yDelta;
 
-    // public int webCamID; ~~ NOT USING WEBCAMS
-
     private void Start() {
-        UpdateMesh();
-        // UpdateCamTexture(); ~~ NOT USING WEBCAMS
+        if (!Config.CURVED_DISPLAY) {
+            Destroy(this.gameObject);
+        }
     }
 
-    private void OnValidate() {        
-        UpdateMesh();
+    private void OnValidate() {
+        CurvedMesh();
     }
 
-    void UpdateMesh() {
+    void CurvedMesh() {
         xDelta = xCurve / xVerts;
         yDelta = yCurve / yVerts;
 
