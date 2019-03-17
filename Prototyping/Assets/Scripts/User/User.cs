@@ -21,6 +21,14 @@ public class User : MonoBehaviour {
         InvokeRepeating("PostHeadPose", 0, Config.POST_HEAD_POSE_MS / 1000f);
     }
 
+    private void Update() {
+        float left = Input.GetAxis("Vertical");
+        float right = Input.GetAxis("RightStick");
+        System.Action<float, float> target = Network.Robot.WheelVel;
+
+        StartCoroutine(Network.Post(target, left, right));
+    }
+
     // Send head pose over the Network
     private void PostHeadPose() {
         Pose headPose = viewer.GetHeadPose();

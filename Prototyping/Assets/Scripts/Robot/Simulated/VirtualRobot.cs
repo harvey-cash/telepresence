@@ -9,6 +9,8 @@ using UnityEngine;
  */
 public class VirtualRobot : TelepresenceRobot
 {
+    public Transform body;
+
     public Camera leftCamera, rightCamera;
     private RenderTexture rendTex;
 
@@ -117,12 +119,24 @@ public class VirtualRobot : TelepresenceRobot
         // Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
 
         // Unity child hierarchy provides us with a quick means of calculating forward kinematics
-        Pose pose = new Pose(headTransform.position, headTransform.rotation);
+        Vector3 localPos = headTransform.position - body.position;
+        Quaternion localRot = Quaternion.FromToRotation(body.forward, headTransform.forward);
+        Pose pose = new Pose(localPos, localRot);
+        
 
         // Simulate network delay
         // StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
         StartCoroutine(Network.Post(target, Time.time / 1000f, left, pose));
     }
 
-    
+    // User sends velocities for each wheel, and we move as a result
+    public override void WheelVel(float left, float right) {
+        float wheelDist = 0.1f;
+        float diff = left - right;
+        Vector3 centre = body.position + body.right * diff * wheelDist;
+
+        body.transform.RotateAround(centre, Vector3.up, diff * Time.deltaTime * 50);
+        float avg = (left + right) / 2;
+        body.transform.localPosition += body.transform.forward * avg * Time.deltaTime * 0.5f;
+    }
 }

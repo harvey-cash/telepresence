@@ -55,4 +55,8 @@ public class MIRORobot : TelepresenceRobot
 
         user.ReceiveImageryAndPose(Time.time, miroImagery.stitched, pose);
     }
+
+    public override void WheelVel(float left, float right) {
+        // Move!
+    }
 }

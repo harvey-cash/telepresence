@@ -37,5 +37,5 @@ public static class Config
     public const int ROBOT_IMAGE_WIDTH = 1280, ROBOT_IMAGE_HEIGHT = 720; // Eye imagery from the robot
     public const float ROBOT_FRAME_WAIT_MS = 67f; // time in ms between frames. 67ms --> 15fps.
     public const float POST_ROBOT_POSE_MS = 20; // Post head pose to user every x ms
-    public const float MAX_MOTOR_SPEED_DEG = 10; // degrees per second
+    public const float MAX_MOTOR_SPEED_DEG = 20; // degrees per second
 }

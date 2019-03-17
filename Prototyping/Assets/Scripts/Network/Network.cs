@@ -51,6 +51,16 @@ public static class Network {
         callBack(timestamp, left, pose);
     }
 
+    // Poster provides the address (method) they wish to post to.
+    public static IEnumerator Post(System.Action<float, float> callBack, float leftWheel, float rightWheel) {
+        if (Config.SIMULATE_DELAY)
+            yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
+        else
+            yield return new WaitForEndOfFrame();
+
+        callBack(leftWheel, rightWheel);
+    }
+
     // Get a network delay in ms
     private static float NetworkDelayMS() {
         // If simulating noise, then vary between min and max
