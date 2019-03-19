@@ -12,14 +12,14 @@ public static class Config
 
     // ~~~~~ NETWORK ~~~~~ //
 
-    public const string POST_HEAD_IP = "tcp://192.168.11.165:5555"; //5
-    public const string GET_IMAGERY_IP = "tcp://192.168.11.165:5556"; //6
+    public const string POST_HEAD_IP = "tcp://192.168.11.208:5555"; //5
+    public const string GET_IMAGERY_IP = "tcp://192.168.11.208:5556"; //6
 
     // ~~~~~ SIMULATED NETWORK ~~~~~ //
 
     public static bool SIMULATE_DELAY = false; // Use network delay?
     public static bool RANDOM_RANGE = false; // If false, use max delay
-    public const float MIN_NETWORK_DELAY_MS = 100f;
+    public const float MIN_NETWORK_DELAY_MS = 200f;
     public const float MAX_NETWORK_DELAY_MS = 200f;
 
     // ~~~~~ DISPLAY ~~~~~ //
