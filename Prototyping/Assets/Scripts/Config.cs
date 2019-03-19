@@ -8,7 +8,7 @@ public static class Config
 
     public static bool USE_VR = true; // VR or desktop?
     public static bool DECOUPLE = true && USE_VR; // Use decoupling technique? (only for VR!)
-    public static bool CENTER_DISPLAY_ON_HEAD = true; // Center display position on head?
+    public static bool CENTER_DISPLAY_ON_HEAD = false; // Center display position on head?
 
     // ~~~~~ NETWORK ~~~~~ //
 

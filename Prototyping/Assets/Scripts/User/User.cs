@@ -7,6 +7,9 @@ public class User : MonoBehaviour {
     public VirtualDisplay display;
     public Viewer viewer;
 
+    private Vector3 storeDisplayPos = Vector3.zero;
+    public void SetStoreDisplayPos(Vector3 pos) { Debug.Log(pos); storeDisplayPos = pos; }
+
     private void Awake() {
         // Join the network
         Network.Join(this);
@@ -19,6 +22,11 @@ public class User : MonoBehaviour {
 
         // Post head pose
         InvokeRepeating("PostHeadPose", 0, Config.POST_HEAD_POSE_MS / 1000f);
+
+        // Pass callback for viewer to set display pos, after a few seconds wait
+        if (!Config.CENTER_DISPLAY_ON_HEAD) {
+            viewer.SetDisplayPosition(SetStoreDisplayPos);
+        }
     }
 
     private void Update() {
@@ -40,10 +48,14 @@ public class User : MonoBehaviour {
     // Stitched Imagery is passed to the display for rendering
     public void ReceiveImageryAndPose(float timestamp, byte[] stitched, Pose pose) {
         // Center display on user?
-        if (Config.CENTER_DISPLAY_ON_HEAD) {
-            pose = new Pose(viewer.transform.position, pose.rotation);
+        if (!Config.CENTER_DISPLAY_ON_HEAD) {
+            // TODO: Account for robot head position change here?
+            pose = new Pose(storeDisplayPos, pose.rotation);
+        }
+        else {
+            pose = new Pose(viewer.GetHeadPose().position, pose.rotation);
         }
 
-        display.Render(timestamp, stitched, pose);
+        display.ReceiveImageryAndPose(timestamp, stitched, pose);
     }
 }

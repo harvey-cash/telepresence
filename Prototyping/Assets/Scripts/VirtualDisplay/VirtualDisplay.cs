@@ -54,23 +54,27 @@ public abstract class VirtualDisplay : MonoBehaviour
     }
 
     // Combined imagery received from ImageStitcher
-    public void Render(float timestamp, byte[] imagery, Pose pose) {
+    public void ReceiveImageryAndPose(float timestamp, byte[] imagery, Pose pose) {
         // Ensure image chronology is maintained
         if (timestamp > timeImage) {
             timeImage = timestamp;
 
-            // GARBAGE COLLECT FIRST, AS TEXTURES CAUSE MEMORY LEAKS IF SIMPLY
-            // OVERWRITTEN.
-            UnityEngine.Object.Destroy(display);
+            Render(imagery, pose);
+        }
+    }
 
-            display = new Texture2D(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, TextureFormat.RGB24, false);
-            display.LoadImage(imagery); // Load JPEG into texture
-            surface.mainTexture = display;
+    private void Render(byte[] imagery, Pose pose) {
+        // GARBAGE COLLECT FIRST, AS TEXTURES CAUSE MEMORY LEAKS IF SIMPLY
+        // OVERWRITTEN.
+        UnityEngine.Object.Destroy(display);
 
-            // View decoupling
-            if (Config.DECOUPLE) {
-                UpdatePose(pose);
-            }
+        display = new Texture2D(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, TextureFormat.RGB24, false);
+        display.LoadImage(imagery); // Load JPEG into texture
+        surface.mainTexture = display;
+
+        // View decoupling
+        if (Config.DECOUPLE) {
+            UpdatePose(pose);
         }
     }
 
