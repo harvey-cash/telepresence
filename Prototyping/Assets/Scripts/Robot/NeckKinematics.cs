@@ -7,7 +7,7 @@ using UnityEngine;
  */
 public static class NeckKinematics {
 
-    // Overload to get angles in radians
+    // Get angles in radians
     public static float[] FindRadAngles(Pose targetPose) {
         float[] angles = FindAngles(targetPose);
         for (int i = 0; i < angles.Length; i++) {
@@ -27,15 +27,18 @@ public static class NeckKinematics {
         float pitchAngle = 0.5f * (Mathf.Cos(Time.time) + 1) * 50;
         */
 
-        // Simplistic tracking
-        Vector3 headForward = targetPose.rotation * Vector3.forward;
-        float yawAngle = Vector3.SignedAngle(Vector3.forward, headForward, Vector3.up) + 50; // account for range
-        float pitchAngle = Vector3.SignedAngle(Vector3.up, headForward, Vector3.Cross(Vector3.up, headForward)) - 63; // account for offset
+        Vector3 rot = targetPose.rotation.eulerAngles;
+        float rotX = rot.x - (Mathf.Round(rot.x / 360f) * 360f);
+        float rotY = rot.y - (Mathf.Round(rot.y / 360f) * 360f);
+        // float rotZ = rot.z - (Mathf.Round(rot.z / 360f) * 360f);
 
-        float liftAngle = 0; // Keep as vertical as possible for simplistic tracking
-        //float pitchAngle = 27; // Keep level
+        float liftAngle = 0;
+        if (Config.USE_MIRO_SERVER) {
+            liftAngle = Config.MIRO_CALIBRATE_DEG[0]; // Level
+        }
 
-        return new float[] { liftAngle, yawAngle, pitchAngle };
+        // Lift, yaw, pitch
+        return new float[] { liftAngle, rotY, rotX };
     }
 
     /* This method calculates the robot head pose based on our

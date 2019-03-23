@@ -11,7 +11,7 @@ public class VirtualRobot : TelepresenceRobot
 {
     public Transform body;
 
-    public Camera leftCamera, rightCamera;
+    public Camera centerCamera; //, rightCamera;
     private RenderTexture rendTex;
 
     private float timePoseHead;
@@ -62,8 +62,8 @@ public class VirtualRobot : TelepresenceRobot
 
     // Disable cameras to avoid unecessary overhead, and create RenderTextures
     private void CameraSetup() {
-        leftCamera.enabled = false;
-        rightCamera.enabled = false;
+        centerCamera.enabled = false;
+        //rightCamera.enabled = false;
         rendTex = new RenderTexture(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, 24);
     }
 
@@ -77,10 +77,10 @@ public class VirtualRobot : TelepresenceRobot
     WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
     private IEnumerator RTImage() {
         yield return frameEnd;
-        byte[] left = GetCameraImage(leftCamera);
-        byte[] right = GetCameraImage(rightCamera);
+        byte[] left = GetCameraImage(centerCamera);
+        //byte[] right = GetCameraImage(rightCamera);
 
-        PostImageryAndPose(left, right);
+        PostImageryAndPose(left, null);
     }
 
     // Creating new Textures so rapidly leads to filling memory very quickly. 

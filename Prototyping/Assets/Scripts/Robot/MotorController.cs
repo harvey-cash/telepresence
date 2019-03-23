@@ -17,6 +17,9 @@ public static class MotorController
 
     // Call for each given DoF (lift, yaw, pitch)
     public static float[] DeltaDegrees(float[] current, float[] target) {
+        // Account for motor offsets
+        target = new float[] { 0f, target[1] + 50, target[2] + 22 };
+
         float[] deltas = new float[current.Length];
         for (int i = 0; i < current.Length; i++) {
             deltas[i] = DeltaDegrees(current[i], target[i]);

@@ -20,7 +20,7 @@ public class MIRORobot : TelepresenceRobot
 
         // Record camera imagery repeatedly
         // Imagery and Pose are automatically posted together
-        InvokeRepeating("GetImagery", 1f, Config.ROBOT_FRAME_WAIT_MS / 1000f);
+        InvokeRepeating("GetImagery", 1f, Config.MIRO_CHECK_FRAME_WAIT_MS / 1000f);
     }
 
     private void Awake() {
@@ -51,7 +51,10 @@ public class MIRORobot : TelepresenceRobot
     // No need to simulate network delay, as already accounted for by the robot posting
     // to the stitching server
     private void GetImagery() {
-        Pose pose = new Pose(Vector3.zero, miroImagery.poseRot);
+        Vector3 miroRot = miroImagery.poseRot.eulerAngles;
+        miroRot += new Vector3(-28, 30, 0); // ACCOUNT FOR OFFSET IN REPORTED HEAD POSE
+
+        Pose pose = new Pose(Vector3.zero, Quaternion.Euler(miroRot));
 
         user.ReceiveImageryAndPose(Time.time, miroImagery.stitched, pose);
     }
