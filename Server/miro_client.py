@@ -5,6 +5,7 @@
 # 2) Publish stitched imagery and robot head data to Unity
 
 import time
+import sys
 import os
 from threading import Thread
 
@@ -36,6 +37,7 @@ class client:
 		# self.check = True
 
 		# ~~~~~~~~~ LOCAL FIELDS ~~~~~~~~~ #
+		self.run_threads = True
 
 		# variables to store input data
 		self.input_camera = [None, None] # Left and right imagery
@@ -101,7 +103,7 @@ class client:
 		self.socket_head_data = self.context.socket(zmq.REP)
 		self.socket_head_data.bind("tcp://*:5555") # Receive on this port
 
-		while True:
+		while self.run_threads:
 
 			message = self.socket_head_data.recv(0, True)
 			data = ast.literal_eval(message)
@@ -153,7 +155,7 @@ class client:
 		self.socket_imagery = self.context.socket(zmq.REP)
 		self.socket_imagery.bind("tcp://*:5556") # Receive on this port
 
-		while True:
+		while self.run_threads:
 
 			message = self.socket_imagery.recv(0, True)
 
@@ -179,6 +181,7 @@ class client:
 			# Concatenate and send
 			messageBytes = imageLengthBytes + stitched + poseBytes
 			self.socket_imagery.send(messageBytes)
+
 
 
     # ~~~~~~~~~ CALLBACKS ~~~~~~~~~ #
@@ -221,3 +224,5 @@ if __name__ == "__main__":
 
 	client.thread_control.start()
 	client.thread_imagery.start()
+
+	print ("Stitching Server Started.")
