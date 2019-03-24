@@ -12,7 +12,6 @@ public class VirtualRobot : TelepresenceRobot
     public Transform body;
 
     public Camera centerCamera; //, rightCamera;
-    private RenderTexture rendTex;
 
     private float timePoseHead;
 
@@ -64,7 +63,6 @@ public class VirtualRobot : TelepresenceRobot
     private void CameraSetup() {
         centerCamera.enabled = false;
         //rightCamera.enabled = false;
-        rendTex = new RenderTexture(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, 24);
     }
 
     // Simply call the RTImage coroutine
@@ -77,43 +75,33 @@ public class VirtualRobot : TelepresenceRobot
     WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
     private IEnumerator RTImage() {
         yield return frameEnd;
-        byte[] left = GetCameraImage(centerCamera);
-        //byte[] right = GetCameraImage(rightCamera);
+        RenderTexture rend = GetCameraImage(centerCamera);
 
-        PostImageryAndPose(left, null);
+        PostImageryAndPose(rend);
     }
 
     // Creating new Textures so rapidly leads to filling memory very quickly. 
     // Take care to ensure they are always eventually garbage collected.
     // 
-    private byte[] GetCameraImage(Camera eyeCam) {
-        Texture2D image = new Texture2D(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, TextureFormat.RGB24, false);
-
-        eyeCam.targetTexture = rendTex;
-        eyeCam.Render();
-        RenderTexture.active = rendTex;
-        image.ReadPixels(new Rect(0, 0, Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT), 0, 0);        
-        image.Apply();        
+    private RenderTexture GetCameraImage(Camera eyeCam) {
+        RenderTexture renderTexture = new RenderTexture(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, 24);
+        eyeCam.targetTexture = renderTexture;
+        eyeCam.Render();             
 
         // reset active camera texture
         // must set camera target to null, or else game view flashes
         eyeCam.targetTexture = null;
         RenderTexture.active = null;
 
-        byte[] jpeg = ImageConversion.EncodeToJPG(image);
-
-        // Ensure garbage is collected
-        Destroy(image);
-
-        return jpeg;
+        return renderTexture;
     }
 
     // Send camera imagery over the Network
     // Encoded as JPEG
-    private void PostImageryAndPose(byte[] left, byte[] right) {
+    private void PostImageryAndPose(RenderTexture renderTexture) {
         // Post images to Stitching Server
         // System.Action<float, byte[], byte[], Pose> target = Network.Server.ReceiveImageryAndPose;
-        System.Action<float, byte[], Pose> target = Network.User.ReceiveImageryAndPose;
+        System.Action<float, RenderTexture, Pose> target = Network.User.ReceiveImageryAndPose;
 
         // CREATE ROBOT POSE FROM NECK MODEL
         // Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
@@ -126,7 +114,7 @@ public class VirtualRobot : TelepresenceRobot
 
         // Simulate network delay
         // StartCoroutine(Network.Post(target, Time.time / 1000f, left, right, pose));
-        StartCoroutine(Network.Post(target, Time.time / 1000f, left, pose));
+        StartCoroutine(Network.Post(target, Time.time / 1000f, renderTexture, pose));
     }
 
     // User sends velocities for each wheel, and we move as a result

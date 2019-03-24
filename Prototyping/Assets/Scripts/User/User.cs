@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,7 +47,7 @@ public class User : MonoBehaviour {
     }
 
     // Stitched Imagery is passed to the display for rendering
-    public void ReceiveImageryAndPose(float timestamp, byte[] stitched, Pose pose) {
+    public void ReceiveImageryAndPose(float timestamp, RenderTexture renderTexture, Pose pose) {
         // Center display on user?
         if (!Config.CENTER_DISPLAY_ON_HEAD) {
             // TODO: Account for robot head position change here?
@@ -56,6 +57,20 @@ public class User : MonoBehaviour {
             pose = new Pose(viewer.GetHeadPose().position, pose.rotation);
         }
 
-        display.ReceiveImageryAndPose(timestamp, stitched, pose);
+        display.ReceiveImageryAndPose(timestamp, renderTexture, pose);
+    }
+
+    // Stitched Imagery is passed to the display for rendering
+    public void ReceiveImageryAndPose(float timestamp, byte[] imagery, Pose pose) {
+        // Center display on user?
+        if (!Config.CENTER_DISPLAY_ON_HEAD) {
+            // TODO: Account for robot head position change here?
+            pose = new Pose(storeDisplayPos, pose.rotation);
+        }
+        else {
+            pose = new Pose(viewer.GetHeadPose().position, pose.rotation);
+        }
+
+        throw new Exception("No implementation for byte[] imagery anymore!");
     }
 }

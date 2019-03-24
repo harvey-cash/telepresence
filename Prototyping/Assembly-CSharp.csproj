@@ -64,7 +64,6 @@
     <Compile Include="Assets\NetMQExample\Scripts\HelloRequester.cs" />
     <Compile Include="Assets\NetMQExample\Scripts\RunAbleThread.cs" />
     <Compile Include="Assets\Scripts\Config.cs" />
-    <Compile Include="Assets\Scripts\Imagery\ImageStitcher.cs" />
     <Compile Include="Assets\Scripts\Imagery\Stabilisation.cs" />
     <Compile Include="Assets\Scripts\Imagery\StitchingServer.cs" />
     <Compile Include="Assets\Scripts\Network\Network.cs" />

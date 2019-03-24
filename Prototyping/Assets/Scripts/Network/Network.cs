@@ -42,13 +42,13 @@ public static class Network {
     }
 
     // Poster provides the address (method) they wish to post to.
-    public static IEnumerator Post(System.Action<float, byte[], Pose> callBack, float timestamp, byte[] left, Pose pose) {
+    public static IEnumerator Post(System.Action<float, RenderTexture, Pose> callBack, float timestamp, RenderTexture renderTexture, Pose pose) {
         if (Config.SIMULATE_DELAY)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();
 
-        callBack(timestamp, left, pose);
+        callBack(timestamp, renderTexture, pose);
     }
 
     // Poster provides the address (method) they wish to post to.
