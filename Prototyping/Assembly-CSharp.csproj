@@ -77,6 +77,7 @@
     <Compile Include="Assets\Scripts\Robot\Simulated\StitchRequester.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\VirtualMotors.cs" />
     <Compile Include="Assets\Scripts\Robot\Simulated\VirtualRobot.cs" />
+    <Compile Include="Assets\Scripts\Tiles\TileMatcher.cs" />
     <Compile Include="Assets\Scripts\User\DesktopMonitor.cs" />
     <Compile Include="Assets\Scripts\User\DesktopViewer.cs" />
     <Compile Include="Assets\Scripts\User\User.cs" />

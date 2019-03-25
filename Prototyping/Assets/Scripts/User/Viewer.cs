@@ -6,7 +6,7 @@ public abstract class Viewer : MonoBehaviour {
 
     public abstract Pose GetHeadPose();
 
-    private float waitThenSetSeconds = 5;
+    private float waitThenSetSeconds = 3;
     public void SetDisplayPosition(System.Action<Vector3> callBack) {
         StartCoroutine(WaitThenGetPose(callBack));
     }

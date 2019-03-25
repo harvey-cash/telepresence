@@ -24,8 +24,11 @@ public class DesktopViewer : Viewer
     public float speed = 3;
 
     void Update() {
-        rotation.y += Input.GetAxis("Mouse X");
-        rotation.x += -Input.GetAxis("Mouse Y");
+        float h = Input.GetAxis("RightStickHorizontal") * 0.1f;
+        float v = Input.GetAxis("RightStickVertical") * 0.1f;
+
+        rotation.y += Input.GetAxis("Mouse X") + h;
+        rotation.x += -Input.GetAxis("Mouse Y") + v;
         transform.eulerAngles = (Vector2)rotation * speed;
     }
 }

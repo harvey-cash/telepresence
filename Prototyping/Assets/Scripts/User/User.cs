@@ -9,7 +9,7 @@ public class User : MonoBehaviour {
     public Viewer viewer;
 
     private Vector3 storeDisplayPos = Vector3.zero;
-    public void SetStoreDisplayPos(Vector3 pos) { Debug.Log(pos); storeDisplayPos = pos; }
+    public void SetStoreDisplayPos(Vector3 pos) { storeDisplayPos = pos; }
 
     private void Awake() {
         // Join the network
@@ -26,16 +26,19 @@ public class User : MonoBehaviour {
 
         // Pass callback for viewer to set display pos, after a few seconds wait
         if (!Config.CENTER_DISPLAY_ON_HEAD) {
+            storeDisplayPos = viewer.GetHeadPose().position;
             viewer.SetDisplayPosition(SetStoreDisplayPos);
         }
     }
 
     private void Update() {
+        /*
         float left = Input.GetAxis("Vertical");
         float right = Input.GetAxis("RightStick");
         System.Action<float, float> target = Network.Robot.WheelVel;
 
         StartCoroutine(Network.Post(target, left, right));
+        */
     }
 
     // Send head pose over the Network
