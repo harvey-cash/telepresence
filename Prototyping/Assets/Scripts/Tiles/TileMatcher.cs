@@ -20,6 +20,8 @@ public class TileMatcher : MonoBehaviour
     private int selection = (int)Mathf.Floor(TILE_COUNT / 2f);
     private bool toggle = true, canChoose = true;
 
+    public static int winCounter = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -161,7 +163,9 @@ public class TileMatcher : MonoBehaviour
     }
 
     private IEnumerator Win() {
-        Debug.Log("Win!");
+        winCounter++;
+        Debug.Log(winCounter + " Wins!");
+
         selectObject.GetComponentInChildren<Renderer>().enabled = false;
 
         canChoose = false;

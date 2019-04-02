@@ -9,7 +9,9 @@ public class User : MonoBehaviour {
     public Viewer viewer;
 
     private Vector3 storeDisplayPos = Vector3.zero;
-    public void SetStoreDisplayPos(Vector3 pos) { storeDisplayPos = pos; }
+    public void SetStoreDisplayPos(Vector3 pos) { clampHeadPosition = false; storeDisplayPos = pos; }
+
+    bool clampHeadPosition = true;
 
     private void Awake() {
         // Join the network
@@ -52,7 +54,7 @@ public class User : MonoBehaviour {
     // Stitched Imagery is passed to the display for rendering
     public void ReceiveImageryAndPose(float timestamp, RenderTexture renderTexture, Pose pose) {
         // Center display on user?
-        if (!Config.CENTER_DISPLAY_ON_HEAD) {
+        if (!Config.CENTER_DISPLAY_ON_HEAD && !clampHeadPosition) {
             // TODO: Account for robot head position change here?
             pose = new Pose(storeDisplayPos, pose.rotation);
         }
@@ -66,8 +68,7 @@ public class User : MonoBehaviour {
     // Stitched Imagery is passed to the display for rendering
     public void ReceiveImageryAndPose(float timestamp, byte[] imagery, Pose pose) {
         // Center display on user?
-        if (!Config.CENTER_DISPLAY_ON_HEAD) {
-            // TODO: Account for robot head position change here?
+        if (!Config.CENTER_DISPLAY_ON_HEAD && !clampHeadPosition) {
             pose = new Pose(storeDisplayPos, pose.rotation);
         }
         else {

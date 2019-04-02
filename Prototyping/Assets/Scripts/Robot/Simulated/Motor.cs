@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Motor : MonoBehaviour
 {
-
     public float maxAngle;
     public Vector3 localRotationAxis;
 
@@ -12,6 +11,7 @@ public class Motor : MonoBehaviour
 
     // Rotate as told, within the angle limits of the motor
     public void Rotate(float deltaDegrees) {
+
         Quaternion deltaRot = Quaternion.Euler(deltaDegrees * localRotationAxis);
         Quaternion proposedRot = deltaRot * transform.localRotation;
 

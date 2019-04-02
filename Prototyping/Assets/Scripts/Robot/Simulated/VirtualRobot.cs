@@ -16,7 +16,7 @@ public class VirtualRobot : TelepresenceRobot
     private float timePoseHead;
 
     private VirtualMotors motors;
-    public Transform headTransform;
+    public Transform eyeTransform;
 
     private void Awake() {
         if (!Config.USE_MIRO_SERVER) {
@@ -45,14 +45,14 @@ public class VirtualRobot : TelepresenceRobot
 
             // USE INVERSE KINEMATICS TO GET ANGLES
             float[] targetAngles = NeckKinematics.FindAngles(headPose);
-            //Debug.Log("TARGET {lift: " + targetAngles[0] + ", yaw: " + targetAngles[1] + ", pitch: " + targetAngles[2] + "}");
+            Debug.Log("TARGET {lift: " + targetAngles[0] + ", yaw: " + targetAngles[1] + ", pitch: " + targetAngles[2] + "}");
 
             // MOVE ROBOT TOWARDS TARGET ANGLES
             float[] currentAngles = motors.GetCurrentAngles();
-            //Debug.Log("CURRENT {lift: " + currentAngles[0] + ", yaw: " + currentAngles[1] + ", pitch: " + currentAngles[2] + "}");
+            Debug.Log("CURRENT {lift: " + currentAngles[0] + ", yaw: " + currentAngles[1] + ", pitch: " + currentAngles[2] + "}");
 
             float[] deltaAngles = MotorController.DeltaDegrees(currentAngles, targetAngles);
-            //Debug.Log("DELTA {lift: " + deltaAngles[0] + ", yaw: " + deltaAngles[1] + ", pitch: " + deltaAngles[2] + "}");
+            Debug.Log("DELTA {lift: " + deltaAngles[0] + ", yaw: " + deltaAngles[1] + ", pitch: " + deltaAngles[2] + "}");
 
             motors.Rotate(deltaAngles);
             
@@ -107,8 +107,8 @@ public class VirtualRobot : TelepresenceRobot
         // Pose robotHeadPose = NeckKinematics.GetHeadPose(motors.GetCurrentAngles());
 
         // Unity child hierarchy provides us with a quick means of calculating forward kinematics
-        Vector3 localPos = headTransform.position - body.position;
-        Quaternion localRot = Quaternion.FromToRotation(body.forward, headTransform.forward);
+        Vector3 localPos = eyeTransform.position - body.position;
+        Quaternion localRot = eyeTransform.rotation; //  Quaternion.FromToRotation(body.forward, eyeTransform.forward);
         Pose pose = new Pose(localPos, localRot);
         
 
