@@ -33,6 +33,7 @@ public class VirtualMotors : MonoBehaviour {
 
     // deltaAngles must be given as {lift, yaw, pitch}
     public void Rotate(float[] deltaAngles) {
+        //Debug.Log(deltaAngles[0] + ", " + deltaAngles[1] + ", " + deltaAngles[2]);
         lift.Rotate(deltaAngles[0]);
         yaw.Rotate(deltaAngles[1]);
         pitch.Rotate(deltaAngles[2]);

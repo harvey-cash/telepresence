@@ -9,23 +9,21 @@ using UnityEngine;
 public static class Network {
 
     public static User User { private set; get; }
+    public static Viewer Viewer { private set; get; }
+    public static VirtualDisplay Display { private set; get; }
     public static TelepresenceRobot Robot { private set; get; }
     public static StitchingServer Server { private set; get; }
 
     // Overloaded methods to allow any Robot, User, or Server to join
-    public static void Join(User u) {
-        User = u;
-    }
-    public static void Join(TelepresenceRobot r) {
-        Robot = r;
-    }
-    public static void Join(StitchingServer s) {
-        Server = s;
-    }
+    public static void Join(User u) { User = u; }
+    public static void Join(Viewer v) { Viewer = v; }
+    public static void Join(VirtualDisplay d) { Display = d; }
+    public static void Join(TelepresenceRobot r) { Robot = r; }
+    public static void Join(StitchingServer s) { Server = s; }
 
     // Poster provides the address (method) they wish to post to.
     public static IEnumerator Post(System.Action<float,Pose> callBack, float timestamp, Pose pose) {
-        if (Config.SIMULATE_DELAY)
+        if (User.mode == MODE.COUPLE_SLOW || User.mode == MODE.DECOUPLE_SLOW)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();
@@ -35,7 +33,7 @@ public static class Network {
 
     // Poster provides the address (method) they wish to post to.
     public static IEnumerator Post(System.Action<float,byte[],byte[],Pose> callBack, float timestamp, byte[] left, byte[] right, Pose pose) {
-        if (Config.SIMULATE_DELAY)
+        if (User.mode == MODE.COUPLE_SLOW || User.mode == MODE.DECOUPLE_SLOW)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();
@@ -44,13 +42,23 @@ public static class Network {
     }
 
     // Poster provides the address (method) they wish to post to.
-    public static IEnumerator Post(System.Action<float, byte[], Pose> callBack, float timestamp, byte[] left, Pose pose) {
-        if (Config.SIMULATE_DELAY)
+    public static IEnumerator Post(System.Action<float, RenderTexture, Pose> callBack, float timestamp, RenderTexture renderTexture, Pose pose) {
+        if (User.mode == MODE.DECOUPLE_SLOW || User.mode == MODE.COUPLE_SLOW)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();
 
-        callBack(timestamp, left, pose);
+        callBack(timestamp, renderTexture, pose);
+    }
+
+    // Poster provides the address (method) they wish to post to.
+    public static IEnumerator Post(System.Action<float, float> callBack, float leftWheel, float rightWheel) {
+        if (User.mode == MODE.DECOUPLE_SLOW || User.mode == MODE.COUPLE_SLOW)
+            yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
+        else
+            yield return new WaitForEndOfFrame();
+
+        callBack(leftWheel, rightWheel);
     }
 
     // Get a network delay in ms

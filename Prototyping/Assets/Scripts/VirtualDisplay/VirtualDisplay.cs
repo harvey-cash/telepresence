@@ -7,27 +7,27 @@ using UnityEngine;
  * Ideally, the display position should be accurate for the camera
  * imagery renderered to it.
  */
-public class VirtualDisplay : MonoBehaviour
+public abstract class VirtualDisplay : MonoBehaviour
 {
+    protected Renderer rend;
+    protected Material surface;
+    public abstract void SetRendAndSurface();
 
     protected User user;
     public void SetUser(User user) {
         this.user = user;
     }
-
-    private Renderer rend;
-    private Material surface;
+    
     private Texture2D display;
 
     private float timePoseStabilise, timeImage;
     private Pose poseDelta;
 
     private void Start() {
-        rend = GetComponent<Renderer>();
-        surface = GetComponent<Renderer>().material;
+        SetRendAndSurface();
 
         // Attach display to viewer
-        if (!Config.DECOUPLE) {
+        if (!(User.user.mode == MODE.DECOUPLE_SLOW || User.user.mode == MODE.DECOUPLE_FAST)) {
             StartCoroutine(WaitThenAttach());
         }
     }
@@ -54,23 +54,33 @@ public class VirtualDisplay : MonoBehaviour
     }
 
     // Combined imagery received from ImageStitcher
-    public void Render(float timestamp, byte[] imagery, Pose pose) {
+    public void ReceiveImageryAndPose(float timestamp, RenderTexture renderTexture, Pose pose) {
         // Ensure image chronology is maintained
         if (timestamp > timeImage) {
             timeImage = timestamp;
 
-            // GARBAGE COLLECT FIRST, AS TEXTURES CAUSE MEMORY LEAKS IF SIMPLY
-            // OVERWRITTEN.
-            UnityEngine.Object.Destroy(display);
+            Render(renderTexture, pose);
+        }
+    }
 
-            display = new Texture2D(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, TextureFormat.RGB24, false);
-            display.LoadImage(imagery); // Load JPEG into texture
-            surface.mainTexture = display;
+    private void Render(RenderTexture renderTexture, Pose pose) {
+        // GARBAGE COLLECT FIRST, AS TEXTURES CAUSE MEMORY LEAKS IF SIMPLY
+        // OVERWRITTEN.
+        UnityEngine.Object.Destroy(display);
 
-            // View decoupling
-            if (Config.DECOUPLE) {
-                UpdatePose(pose);
-            }
+        display = new Texture2D(Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT, TextureFormat.RGB24, false);
+        RenderTexture.active = renderTexture;
+        display.ReadPixels(new Rect(0, 0, Config.ROBOT_IMAGE_WIDTH, Config.ROBOT_IMAGE_HEIGHT), 0, 0); // Load JPEG into texture
+        display.Apply();
+        RenderTexture.active = null;
+
+        surface.mainTexture = display;
+
+        DestroyImmediate(renderTexture);
+
+        // View decoupling
+        if (User.user.mode == MODE.DECOUPLE_SLOW || User.user.mode == MODE.DECOUPLE_FAST) {
+            UpdatePose(pose);
         }
     }
 

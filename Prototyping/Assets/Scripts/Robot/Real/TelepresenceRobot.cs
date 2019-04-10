@@ -6,4 +6,6 @@ public abstract class TelepresenceRobot : MonoBehaviour
 {
     // VR Headset Pose
     public abstract void ReceiveHeadPose(float timestamp, Pose headPose);
+
+    public abstract void WheelVel(float left, float right);
 }
