@@ -45,14 +45,14 @@ public class VirtualRobot : TelepresenceRobot
 
             // USE INVERSE KINEMATICS TO GET ANGLES
             float[] targetAngles = NeckKinematics.FindAngles(headPose);
-            Debug.Log("TARGET {lift: " + targetAngles[0] + ", yaw: " + targetAngles[1] + ", pitch: " + targetAngles[2] + "}");
+            //Debug.Log("TARGET {lift: " + targetAngles[0] + ", yaw: " + targetAngles[1] + ", pitch: " + targetAngles[2] + "}");
 
             // MOVE ROBOT TOWARDS TARGET ANGLES
             float[] currentAngles = motors.GetCurrentAngles();
-            Debug.Log("CURRENT {lift: " + currentAngles[0] + ", yaw: " + currentAngles[1] + ", pitch: " + currentAngles[2] + "}");
+            //Debug.Log("CURRENT {lift: " + currentAngles[0] + ", yaw: " + currentAngles[1] + ", pitch: " + currentAngles[2] + "}");
 
             float[] deltaAngles = MotorController.DeltaDegrees(currentAngles, targetAngles);
-            Debug.Log("DELTA {lift: " + deltaAngles[0] + ", yaw: " + deltaAngles[1] + ", pitch: " + deltaAngles[2] + "}");
+            //Debug.Log("DELTA {lift: " + deltaAngles[0] + ", yaw: " + deltaAngles[1] + ", pitch: " + deltaAngles[2] + "}");
 
             motors.Rotate(deltaAngles);
             

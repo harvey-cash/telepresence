@@ -23,7 +23,7 @@ public static class Network {
 
     // Poster provides the address (method) they wish to post to.
     public static IEnumerator Post(System.Action<float,Pose> callBack, float timestamp, Pose pose) {
-        if (Config.SIMULATE_DELAY)
+        if (User.mode == MODE.COUPLE_SLOW || User.mode == MODE.DECOUPLE_SLOW)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();
@@ -33,7 +33,7 @@ public static class Network {
 
     // Poster provides the address (method) they wish to post to.
     public static IEnumerator Post(System.Action<float,byte[],byte[],Pose> callBack, float timestamp, byte[] left, byte[] right, Pose pose) {
-        if (Config.SIMULATE_DELAY)
+        if (User.mode == MODE.COUPLE_SLOW || User.mode == MODE.DECOUPLE_SLOW)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();
@@ -43,7 +43,7 @@ public static class Network {
 
     // Poster provides the address (method) they wish to post to.
     public static IEnumerator Post(System.Action<float, RenderTexture, Pose> callBack, float timestamp, RenderTexture renderTexture, Pose pose) {
-        if (Config.SIMULATE_DELAY)
+        if (User.mode == MODE.DECOUPLE_SLOW || User.mode == MODE.COUPLE_SLOW)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();
@@ -53,7 +53,7 @@ public static class Network {
 
     // Poster provides the address (method) they wish to post to.
     public static IEnumerator Post(System.Action<float, float> callBack, float leftWheel, float rightWheel) {
-        if (Config.SIMULATE_DELAY)
+        if (User.mode == MODE.DECOUPLE_SLOW || User.mode == MODE.COUPLE_SLOW)
             yield return new WaitForSeconds(NetworkDelayMS() / 1000f);
         else
             yield return new WaitForEndOfFrame();

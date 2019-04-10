@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\Config.cs" />
     <Compile Include="Assets\Scripts\Imagery\Stabilisation.cs" />
     <Compile Include="Assets\Scripts\Imagery\StitchingServer.cs" />
+    <Compile Include="Assets\Scripts\MODE.cs" />
     <Compile Include="Assets\Scripts\Network\Network.cs" />
     <Compile Include="Assets\Scripts\Robot\MotorController.cs" />
     <Compile Include="Assets\Scripts\Robot\NeckKinematics.cs" />

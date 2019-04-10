@@ -7,7 +7,7 @@ public static class Config
     // ~~~~~ DECOUPLING ~~~~~ //
 
     public static bool USE_VR = true; // VR or desktop?
-    public static bool DECOUPLE = true && USE_VR; // Use decoupling technique? (only for VR!)
+    //public static bool DECOUPLE = true && USE_VR; // Use decoupling technique? (only for VR!)
     public static bool CENTER_DISPLAY_ON_HEAD = false; // Center display position on head?
 
     // ~~~~~ NETWORK ~~~~~ //
@@ -17,10 +17,10 @@ public static class Config
 
     // ~~~~~ SIMULATED NETWORK ~~~~~ //
 
-    public static bool SIMULATE_DELAY = false; // Use network delay?
+    //public static bool SIMULATE_DELAY = false; // Use network delay?
     public static bool RANDOM_RANGE = false; // If false, use max delay
     public const float MIN_NETWORK_DELAY_MS = 200f;
-    public const float MAX_NETWORK_DELAY_MS = 200f;
+    public const float MAX_NETWORK_DELAY_MS = 50f;
 
     // ~~~~~ DISPLAY ~~~~~ //
 

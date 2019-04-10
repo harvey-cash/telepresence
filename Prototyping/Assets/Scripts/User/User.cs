@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class User : MonoBehaviour {
+    public static User user;
+    
+    [SerializeField]
+    public MODE mode;
 
     public VirtualDisplay display;
     public Viewer viewer;
@@ -14,6 +18,9 @@ public class User : MonoBehaviour {
     bool clampHeadPosition = true;
 
     private void Awake() {
+        user = this;
+        Debug.LogWarning("MODE IS: " + mode.ToString());
+
         // Join the network
         Network.Join(this);
     }

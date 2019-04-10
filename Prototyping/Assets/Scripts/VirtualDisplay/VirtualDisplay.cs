@@ -27,7 +27,7 @@ public abstract class VirtualDisplay : MonoBehaviour
         SetRendAndSurface();
 
         // Attach display to viewer
-        if (!Config.DECOUPLE) {
+        if (!(User.user.mode == MODE.DECOUPLE_SLOW || User.user.mode == MODE.DECOUPLE_FAST)) {
             StartCoroutine(WaitThenAttach());
         }
     }
@@ -79,7 +79,7 @@ public abstract class VirtualDisplay : MonoBehaviour
         DestroyImmediate(renderTexture);
 
         // View decoupling
-        if (Config.DECOUPLE) {
+        if (User.user.mode == MODE.DECOUPLE_SLOW || User.user.mode == MODE.DECOUPLE_FAST) {
             UpdatePose(pose);
         }
     }

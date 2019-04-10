@@ -32,7 +32,7 @@ public class TileMatcher : MonoBehaviour
         }
 
         NewRound();
-        MoveSelection(0);
+        MoveSelectionBy(0);
     }
 
     private void NewRound() {
@@ -43,6 +43,8 @@ public class TileMatcher : MonoBehaviour
 
             tiles[i] = CreateTile(i, roundMaterials[i]);
         }
+
+        ResetSelection();
     }
 
     private GameObject CreateTile(int i, Material material) {
@@ -102,7 +104,7 @@ public class TileMatcher : MonoBehaviour
     {
         float move = Input.GetAxis("Horizontal");
         if (toggle && Mathf.Abs(move) > 0.5f) {
-            MoveSelection(Mathf.RoundToInt(move));
+            MoveSelectionBy(Mathf.RoundToInt(move));
 
             StartCoroutine(Toggle());
         }
@@ -119,7 +121,12 @@ public class TileMatcher : MonoBehaviour
         toggle = true;
     }
 
-    private void MoveSelection(int delta) {
+    private void ResetSelection() {
+        selection = Mathf.RoundToInt((TILE_COUNT-1) / 2f);
+        MoveSelectionBy(0);
+    }
+
+    private void MoveSelectionBy(int delta) {
         if (chosenIndex != selection) {
             tiles[selection].GetComponent<Renderer>().material.color = new Color(1, 1, 1);
         }        
